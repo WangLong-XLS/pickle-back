@@ -1,0 +1,51 @@
+# ???? WEB ????
+server:
+  port: 8888
+  servlet:
+    #系统上下文
+    context-path: /pickle
+    #session超时时间
+    session:
+      timeout: 60m
+  tomcat:
+    # 连接超时设置
+    connection-timeout: 60000  # 60秒
+    max-keep-alive-requests: 100
+    # 增加最大线程数
+    max-threads: 200
+    min-spare-threads: 20
+    # 增加最大连接数
+    max-connections: 10000
+    # 接受队列长度
+    accept-count: 100
+
+spring:
+  #是否开启jmx监控，采用其他监控工具调试时可开启
+  jmx:
+    enabled: false
+  #激活辅助配置文件
+  profiles:
+    active: dev
+  # 上传文件最大大小
+  servlet:
+    multipart:
+      # 启用 Spring Boot 文件上传功能
+      enabled: true
+      #一个上传文件的大小限制，值为空或删除该项则为1m
+      max-file-size: 50MB
+      #一次请求所有上传文件的总大小限制，默认10m
+      max-request-size: 100MB
+
+
+logging:
+  level:
+    root: info
+    org.springframework.web: info
+  # 设置日志文件输出路径
+  file:
+    name: logs/springboot-app.log
+
+
+
+user_name: sadmin
+user_password: 1

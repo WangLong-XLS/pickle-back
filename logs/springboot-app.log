@@ -1,0 +1,13 @@
+2026-03-09T21:19:41.684+08:00  INFO 42772 --- [main] com.pickle.web.PickleBackApplication     : Starting PickleBackApplication using Java 21.0.9 with PID 42772 (D:\install data\IdeaProjects\pickle\pickle-back\pickle-web\target\classes started by wl in D:\install data\IdeaProjects\pickle\pickle-back)
+2026-03-09T21:19:41.691+08:00  INFO 42772 --- [main] com.pickle.web.PickleBackApplication     : The following 1 profile is active: "dev"
+2026-03-09T21:19:42.153+08:00  INFO 42772 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-03-09T21:19:42.155+08:00  INFO 42772 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-03-09T21:19:42.174+08:00  INFO 42772 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 7 ms. Found 0 Redis repository interfaces.
+2026-03-09T21:19:42.597+08:00  INFO 42772 --- [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8888 (http)
+2026-03-09T21:19:42.609+08:00  INFO 42772 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-03-09T21:19:42.609+08:00  INFO 42772 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-03-09T21:19:42.655+08:00  INFO 42772 --- [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 924 ms
+2026-03-09T21:19:43.669+08:00  INFO 42772 --- [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8888 (http) with context path '/pickle'
+2026-03-09T21:19:43.674+08:00  INFO 42772 --- [main] com.pickle.web.PickleBackApplication     : Started PickleBackApplication in 2.356 seconds (process running for 2.864)
+2026-03-09T21:19:47.321+08:00  INFO 42772 --- [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-03-09T21:19:47.326+08:00  INFO 42772 --- [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
