@@ -1,66 +1,33 @@
 {
-  "meta": {
-    "lastTouchedVersion": "2026.3.11",
-    "lastTouchedAt": "2026-03-13T05:43:56.942Z"
-  },
   "wizard": {
-    "lastRunAt": "2026-03-12T11:33:21.352Z",
-    "lastRunVersion": "2026.3.11",
-    "lastRunCommand": "configure",
+    "lastRunAt": "2026-03-17T12:52:29.426Z",
+    "lastRunVersion": "2026.2.23-cn",
+    "lastRunCommand": "onboard",
     "lastRunMode": "local"
-  },
-  "auth": {
-    "profiles": {
-      "openai:default": {
-        "provider": "openai",
-        "mode": "api_key"
-      },
-      "volcengine:default": {
-        "provider": "volcengine",
-        "mode": "api_key"
-      }
-    }
-  },
-  "models": {
-    "providers": {
-      "deepseek": {
-        "baseUrl": "https://api.deepseek.com/v1",
-        "apiKey": "sk-adda7e43d0b7426bbc039e38e2f66a80",
-        "api": "openai-completions",
-        "models": [
-          {
-            "id": "deepseek-chat",
-            "name": "DeepSeek Chat",
-            "contextWindow": 200000
-          }
-        ]
-      }
-    }
   },
   "agents": {
     "defaults": {
       "model": {
-        "primary": "deepseek/deepseek-chat",
-        "fallbacks": [
-          "openai/gpt-5.1-codex",
-          "openai/gpt-5"
-        ]
+        "primary": "openai/gpt-5.2"
       },
       "models": {
         "openai/gpt-5.1-codex": {
           "alias": "GPT"
         },
-        "volcengine-plan/ark-code-latest": {},
-        "openai/gpt-5": {}
+        "openai/gpt-5.2": {}
       },
       "workspace": "/root/.openclaw/workspace",
       "compaction": {
         "mode": "safeguard"
+      },
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8
       }
     }
   },
-  "tools": {
-    "profile": "coding"
+  "messages": {
+    "ackReactionScope": "group-mentions"
   },
   "commands": {
     "native": "auto",
@@ -71,37 +38,80 @@
   "session": {
     "dmScope": "per-channel-peer"
   },
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "session-memory": {
+          "enabled": true
+        },
+        "command-logger": {
+          "enabled": true
+        }
+      }
+    }
+  },
+  "channels": {
+    "feishu": {
+      "enabled": true,
+      "appId": "cli_a93fc08079b8dbd7",
+      "appSecret": "NgClMvvkwVhJby6UNAtjAtusHecYQA1N",
+      "domain": "feishu",
+      "groupPolicy": "open"
+    }
+  },
   "gateway": {
-    "port": 18789,
+    "port": 18001,
     "mode": "local",
     "bind": "loopback",
-    "controlUi": {
-      "allowedOrigins": [
-        "http://localhost:18789",
-        "http://127.0.0.1:18789"
-      ]
-    },
     "auth": {
       "mode": "token",
-      "token": "ee0cbe7c47744e90a3b62fadfd0febf5fecb5ac4678ed3d8"
+      "token": "a01eb82479ead64bc9141b805e8ce120f6f79dc6333f5dbc"
     },
     "tailscale": {
       "mode": "off",
       "resetOnExit": false
-    },
-    "remote": {
-      "token": "ee0cbe7c47744e90a3b62fadfd0febf5fecb5ac4678ed3d8"
     },
     "nodes": {
       "denyCommands": [
         "camera.snap",
         "camera.clip",
         "screen.record",
-        "contacts.add",
         "calendar.add",
-        "reminders.add",
-        "sms.send"
+        "contacts.add",
+        "reminders.add"
       ]
     }
+  },
+  "plugins": {
+    "load": {
+      "paths": [
+      ]
+    },
+    "entries": {
+      "feishu": {
+        "enabled": true
+      }
+    },
+    "installs": {
+      "feishu": {
+        "source": "npm",
+        "spec": "@openclaw/feishu",
+        "installPath": "/root/.openclaw/extensions/feishu",
+        "version": "2026.3.13",
+        "resolvedName": "@openclaw/feishu",
+        "resolvedVersion": "2026.3.13",
+        "resolvedSpec": "@openclaw/feishu@2026.3.13",
+        "integrity": "sha512-D5vPkgGZ9lfCQnDFlGrQN6NCSUYRgYW9k7amW3qlm9zBI4Sp+alRZVqLZ4yZ2eCXHjw9RVp/L75wjJ7NBQyfEw==",
+        "shasum": "39128ff918f8d3387331818cbe3f8b24a82e4c0d",
+        "resolvedAt": "2026-03-17T12:42:24.388Z",
+        "installedAt": "2026-03-17T12:42:46.461Z"
+      }
+    },
+    "allow": ["feishu"]
+  },
+  "meta": {
+    "lastTouchedVersion": "2026.2.23-cn",
+    "lastTouchedAt": "2026-03-17T12:52:29.514Z"
   }
 }
