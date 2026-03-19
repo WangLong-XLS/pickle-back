@@ -1,13 +1,21 @@
 {
   "meta": {
     "lastTouchedVersion": "2026.3.14",
-    "lastTouchedAt": "2026-03-19T05:07:17.607Z"
+    "lastTouchedAt": "2026-03-19T06:17:20.779Z"
   },
   "wizard": {
-    "lastRunAt": "2026-03-19T05:07:17.565Z",
+    "lastRunAt": "2026-03-19T06:17:20.738Z",
     "lastRunVersion": "2026.3.14",
     "lastRunCommand": "configure",
     "lastRunMode": "local"
+  },
+  "auth": {
+    "profiles": {
+      "volcengine:default": {
+        "provider": "volcengine",
+        "mode": "api_key"
+      }
+    }
   },
   "models": {
     "providers": {
@@ -17,10 +25,12 @@
         "api": "openai-completions",
         "models": [
           {
-            "id": "doubao-seed-1-8-251228",
-            "name": "Doubao-Seed-1.8",
-            "reasoning": false,
-            "input": ["text"],
+            "id": "ark-code-latest",
+            "name": "Coding Plan Auto",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
             "contextWindow": 128000,
             "maxTokens": 4096
           }
@@ -31,16 +41,11 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "volcengine/doubao-seed-1-8-251228",
-        "fallbacks": [
-        ]
+        "primary": "volcengine-plan/ark-code-latest",
+        "fallbacks": []
       },
       "models": {
-        "volcengine/doubao-seed-1-8-251228": {
-          "alias": "豆包Seed"
-        },
-        "openai/gpt-4.1": {},
-        "openai/gpt-4": {}
+        "volcengine/doubao-seed-1-8-251228": {}
       },
       "workspace": "/root/.openclaw/workspace"
     }
