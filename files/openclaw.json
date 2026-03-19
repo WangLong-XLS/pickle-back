@@ -9,17 +9,36 @@
     "lastRunCommand": "configure",
     "lastRunMode": "local"
   },
+  "models": {
+    "providers": {
+      "volcengine": {
+        "baseUrl": "https://ark.cn-beijing.volces.com/api/coding/v3",
+        "apiKey": "1d952f94-fed5-432f-a4b7-e2c44499e0d7",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "doubao-seed-1-8-251228",
+            "name": "Doubao-Seed-1.8",
+            "reasoning": false,
+            "input": ["text"],
+            "contextWindow": 128000,
+            "maxTokens": 4096
+          }
+        ]
+      }
+    }
+  },
   "agents": {
     "defaults": {
       "model": {
-        "primary": "openai/gpt-4.1",
+        "primary": "volcengine/doubao-seed-1-8-251228",
         "fallbacks": [
-          "amazon-bedrock/deepseek.v3.2",
-          "openai/gpt-4"
         ]
       },
       "models": {
-        "amazon-bedrock/deepseek.v3.2": {},
+        "volcengine/doubao-seed-1-8-251228": {
+          "alias": "豆包Seed"
+        },
         "openai/gpt-4.1": {},
         "openai/gpt-4": {}
       },
