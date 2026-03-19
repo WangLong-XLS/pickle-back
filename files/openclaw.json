@@ -9,47 +9,6 @@
     "lastRunCommand": "configure",
     "lastRunMode": "local"
   },
-  "auth": {
-    "profiles": {
-      "volcengine:default": {
-        "provider": "volcengine",
-        "mode": "api_key"
-      }
-    }
-  },
-  "models": {
-    "providers": {
-      "volcengine": {
-        "baseUrl": "https://ark.cn-beijing.volces.com/api/coding/v3",
-        "apiKey": "1d952f94-fed5-432f-a4b7-e2c44499e0d7",
-        "api": "openai-completions",
-        "models": [
-          {
-            "id": "ark-code-latest",
-            "name": "Coding Plan Auto",
-            "reasoning": true,
-            "input": [
-              "text"
-            ],
-            "contextWindow": 128000,
-            "maxTokens": 4096
-          }
-        ]
-      }
-    }
-  },
-  "agents": {
-    "defaults": {
-      "model": {
-        "primary": "volcengine-plan/ark-code-latest",
-        "fallbacks": []
-      },
-      "models": {
-        "volcengine/doubao-seed-1-8-251228": {}
-      },
-      "workspace": "/root/.openclaw/workspace"
-    }
-  },
   "tools": {
     "profile": "coding"
   },
