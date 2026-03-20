@@ -1,13 +1,54 @@
 {
   "meta": {
     "lastTouchedVersion": "2026.3.14",
-    "lastTouchedAt": "2026-03-19T06:17:20.779Z"
+    "lastTouchedAt": "2026-03-19T09:41:22.203Z"
   },
   "wizard": {
-    "lastRunAt": "2026-03-19T06:17:20.738Z",
+    "lastRunAt": "2026-03-19T09:41:22.188Z",
     "lastRunVersion": "2026.3.14",
     "lastRunCommand": "configure",
     "lastRunMode": "local"
+  },
+  "auth": {
+    "profiles": {
+      "volcengine:default": {
+        "provider": "volcengine",
+        "mode": "api_key"
+      }
+    }
+  },
+  "models": {
+    "providers": {
+      "volcengine": {
+        "baseUrl": "https://ark.cn-beijing.volces.com/api/v3",
+        "apiKey": "1d952f94-fed5-432f-a4b7-e2c44499e0d7",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "doubao-seed-1-8-251228",
+            "name": "doubao-seed-1-8-251228",
+            "reasoning": true,
+            "input": ["text"],
+            "contextWindow": 128000,
+            "maxTokens": 4096
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "volcengine/doubao-seed-1-8-251228",
+        "fallbacks": []
+      },
+      "models": {
+        "volcengine/doubao-seed-1-8-251228": {
+          "alias": "豆包1.8"
+        }
+      },
+      "workspace": "/root/.openclaw/workspace"
+    }
   },
   "tools": {
     "profile": "coding"
@@ -46,7 +87,7 @@
     "bind": "loopback",
     "auth": {
       "mode": "token",
-      "token": "60a64674f03f6e2dea471dbebb3465c40384e1fe306d7594"
+      "token": "ba3bf09fa4ebe3f0dfbd22cff2c1ff1c2252d860a30c5fa1"
     },
     "tailscale": {
       "mode": "off",
