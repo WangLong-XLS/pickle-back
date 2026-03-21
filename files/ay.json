@@ -1,18 +1,22 @@
 {
   "meta": {
     "lastTouchedVersion": "2026.3.14",
-    "lastTouchedAt": "2026-03-20T07:08:13.502Z"
+    "lastTouchedAt": "2026-03-20T08:00:00.000Z"
   },
   "wizard": {
-    "lastRunAt": "2026-03-19T09:41:22.188Z",
+    "lastRunAt": "2026-03-20T07:29:21.043Z",
     "lastRunVersion": "2026.3.14",
-    "lastRunCommand": "configure",
+    "lastRunCommand": "onboard",
     "lastRunMode": "local"
   },
   "auth": {
     "profiles": {
       "volcengine:default": {
         "provider": "volcengine",
+        "mode": "api_key"
+      },
+      "vercel-ai-gateway:default": {
+        "provider": "vercel-ai-gateway",
         "mode": "api_key"
       }
     }
@@ -27,51 +31,30 @@
           {
             "id": "doubao-seed-2-0-pro-260215",
             "name": "Doubao-Seed-2.0-Pro",
-            "api": "openai-completions",
             "reasoning": true,
             "input": [
               "text"
             ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
             "contextWindow": 128000,
             "maxTokens": 4096
           },
           {
             "id": "doubao-seed-2-0-lite-260215",
             "name": "Doubao-Seed-2.0-Lite",
-            "api": "openai-completions",
             "reasoning": false,
             "input": [
               "text"
             ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
             "contextWindow": 128000,
             "maxTokens": 4096
           },
           {
             "id": "doubao-seed-2-0-code-260215",
             "name": "Doubao-Seed-2.0-Code",
-            "api": "openai-completions",
             "reasoning": true,
             "input": [
               "text"
             ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
             "contextWindow": 128000,
             "maxTokens": 4096
           }
@@ -97,23 +80,16 @@
         },
         "volcengine/doubao-seed-2-0-lite-260215": {
           "alias": "豆包2.0 Lite"
+        },
+        "vercel-ai-gateway/anthropic/claude-opus-4.6": {
+          "alias": "Claude Opus (备用)"
         }
       },
-      "workspace": "/root/.openclaw/workspace",
-      "compaction": {
-        "mode": "safeguard"
-      },
-      "maxConcurrent": 4,
-      "subagents": {
-        "maxConcurrent": 8
-      }
+      "workspace": "/home/ayuan/.openclaw/workspace"
     }
   },
   "tools": {
     "profile": "coding"
-  },
-  "messages": {
-    "ackReactionScope": "group-mentions"
   },
   "commands": {
     "native": "auto",
@@ -128,51 +104,25 @@
     "internal": {
       "enabled": true,
       "entries": {
-        "command-logger": {
-          "enabled": true
-        },
         "boot-md": {
           "enabled": true
         },
-        "session-memory": {
+        "command-logger": {
           "enabled": true
         },
-        "bootstrap-extra-files": {
-          "enabled": true
-        }
-      }
-    }
-  },
-  "channels": {
-    "feishu": {
-      "enabled": true,
-      "appId": "cli_a93fc08079b8dbd7",
-      "appSecret": "NgClMvvkwVhJby6UNAtjAtusHecYQA1N",
-      "domain": "feishu",
-      "connectionMode": "websocket",
-      "requireMention": true,
-      "dmPolicy": "allowlist",
-      "allowFrom": [
-        "ou_23e3d9093c9a1f0805c75a16086d808e"
-      ],
-      "groupAllowFrom": [
-        "ou_23e3d9093c9a1f0805c75a16086d808e"
-      ],
-      "groupPolicy": "allowlist",
-      "groups": {
-        "*": {
+        "session-memory": {
           "enabled": true
         }
       }
     }
   },
   "gateway": {
-    "port": 18881,
+    "port": 18789,
     "mode": "local",
     "bind": "loopback",
     "auth": {
       "mode": "token",
-      "token": "ba3bf09fa4ebe3f0dfbd22cff2c1ff1c2252d860a30c5fa1"
+      "token": "a8392751cba3c59d6a767b1184d736ab1a124282c840b488"
     },
     "tailscale": {
       "mode": "off",
@@ -196,9 +146,37 @@
     ],
     "entries": {
       "feishu": {
-        "enabled": true
+        "enabled": true,
+        "config": {
+          "appId": "cli_a937a9fc2ae39bcd",
+          "appSecret": "vZ49EiTPf5No7pnwRbhcxhCeRt2phVhH",
+          "verificationToken": "CSZkyrxYJRNW3LU7l12E6ctfeNLxRNR2"
+        }
       }
     },
     "installs": {}
+  },
+  "channels": {
+    "feishu": {
+      "enabled": true,
+      "appId": "cli_a937a9fc2ae39bcd",
+      "appSecret": "vZ49EiTPf5No7pnwRbhcxhCeRt2phVhH",
+      "domain": "feishu",
+      "connectionMode": "websocket",
+      "requireMention": true,
+      "dmPolicy": "allowlist",
+      "allowFrom": [
+        "ou_38f8775845192b1f799f8c4556c96b20"
+      ],
+      "groupAllowFrom": [
+        "ou_38f8775845192b1f799f8c4556c96b20"
+      ],
+      "groupPolicy": "allowlist",
+      "groups": {
+        "*": {
+          "enabled": true
+        }
+      }
+    }
   }
 }
