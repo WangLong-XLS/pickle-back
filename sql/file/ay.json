@@ -1,0 +1,182 @@
+{
+  "meta": {
+    "lastTouchedVersion": "2026.3.14",
+    "lastTouchedAt": "2026-03-20T08:00:00.000Z"
+  },
+  "wizard": {
+    "lastRunAt": "2026-03-20T07:29:21.043Z",
+    "lastRunVersion": "2026.3.14",
+    "lastRunCommand": "onboard",
+    "lastRunMode": "local"
+  },
+  "auth": {
+    "profiles": {
+      "volcengine:default": {
+        "provider": "volcengine",
+        "mode": "api_key"
+      },
+      "vercel-ai-gateway:default": {
+        "provider": "vercel-ai-gateway",
+        "mode": "api_key"
+      }
+    }
+  },
+  "models": {
+    "providers": {
+      "volcengine": {
+        "baseUrl": "https://ark.cn-beijing.volces.com/api/v3",
+        "apiKey": "1d952f94-fed5-432f-a4b7-e2c44499e0d7",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "doubao-seed-2-0-pro-260215",
+            "name": "Doubao-Seed-2.0-Pro",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "contextWindow": 128000,
+            "maxTokens": 4096
+          },
+          {
+            "id": "doubao-seed-2-0-lite-260215",
+            "name": "Doubao-Seed-2.0-Lite",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "contextWindow": 128000,
+            "maxTokens": 4096
+          },
+          {
+            "id": "doubao-seed-2-0-code-260215",
+            "name": "Doubao-Seed-2.0-Code",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "contextWindow": 128000,
+            "maxTokens": 4096
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "volcengine/doubao-seed-2-0-pro-260215",
+        "fallbacks": [
+          "volcengine/doubao-seed-2-0-code-260215",
+          "volcengine/doubao-seed-2-0-lite-260215"
+        ]
+      },
+      "models": {
+        "volcengine/doubao-seed-2-0-pro-260215": {
+          "alias": "豆包2.0 Pro"
+        },
+        "volcengine/doubao-seed-2-0-code-260215": {
+          "alias": "豆包2.0 Code"
+        },
+        "volcengine/doubao-seed-2-0-lite-260215": {
+          "alias": "豆包2.0 Lite"
+        },
+        "vercel-ai-gateway/anthropic/claude-opus-4.6": {
+          "alias": "Claude Opus (备用)"
+        }
+      },
+      "workspace": "/home/ayuan/.openclaw/workspace"
+    }
+  },
+  "tools": {
+    "profile": "coding"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "boot-md": {
+          "enabled": true
+        },
+        "command-logger": {
+          "enabled": true
+        },
+        "session-memory": {
+          "enabled": true
+        }
+      }
+    }
+  },
+  "gateway": {
+    "port": 18789,
+    "mode": "local",
+    "bind": "loopback",
+    "auth": {
+      "mode": "token",
+      "token": "a8392751cba3c59d6a767b1184d736ab1a124282c840b488"
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    },
+    "nodes": {
+      "denyCommands": [
+        "camera.snap",
+        "camera.clip",
+        "screen.record",
+        "contacts.add",
+        "calendar.add",
+        "reminders.add",
+        "sms.send"
+      ]
+    }
+  },
+  "plugins": {
+    "allow": [
+      "feishu"
+    ],
+    "entries": {
+      "feishu": {
+        "enabled": true,
+        "config": {
+          "appId": "cli_a937a9fc2ae39bcd",
+          "appSecret": "vZ49EiTPf5No7pnwRbhcxhCeRt2phVhH",
+          "verificationToken": "CSZkyrxYJRNW3LU7l12E6ctfeNLxRNR2"
+        }
+      }
+    },
+    "installs": {}
+  },
+  "channels": {
+    "feishu": {
+      "enabled": true,
+      "appId": "cli_a937a9fc2ae39bcd",
+      "appSecret": "vZ49EiTPf5No7pnwRbhcxhCeRt2phVhH",
+      "domain": "feishu",
+      "connectionMode": "websocket",
+      "requireMention": true,
+      "dmPolicy": "allowlist",
+      "allowFrom": [
+        "ou_38f8775845192b1f799f8c4556c96b20"
+      ],
+      "groupAllowFrom": [
+        "ou_38f8775845192b1f799f8c4556c96b20"
+      ],
+      "groupPolicy": "allowlist",
+      "groups": {
+        "*": {
+          "enabled": true
+        }
+      }
+    }
+  }
+}
