@@ -32,9 +32,15 @@ build/
 ### VS Code ###
 .vscode/
 
-### files ###
-logs
-/*.log
+### logs ###
+logs/
+*.log
+*.log.*
 
-file
-/*.*
+### 其他常见临时文件 ###
+*.tmp
+*.temp
+
+### files ###
+file/
+    *.*

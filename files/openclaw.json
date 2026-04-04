@@ -1,7 +1,7 @@
 {
   "meta": {
     "lastTouchedVersion": "2026.3.14",
-    "lastTouchedAt": "2026-03-20T07:08:13.502Z"
+    "lastTouchedAt": "2026-03-23T12:55:56.712Z"
   },
   "wizard": {
     "lastRunAt": "2026-03-19T09:41:22.188Z",
@@ -110,7 +110,7 @@
     }
   },
   "tools": {
-    "profile": "coding"
+    "profile": "full"
   },
   "messages": {
     "ackReactionScope": "group-mentions"
@@ -200,5 +200,12 @@
       }
     },
     "installs": {}
+  },
+  "skills": {
+    "entries": {
+      "self-improving-agent": {
+        "enabled": true
+      }
+    }
   }
 }
