@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -25,35 +26,44 @@ import java.time.Duration;
 @EnableCaching
 public class RedisConfig {
 
+    /**
+     * 创建并配置 ObjectMapper（抽取为公共方法，避免重复代码）
+     */
+    private ObjectMapper createObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // 设置可见性
+        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+
+        // Jackson 2.10+ 推荐使用 activateDefaultTyping，你已经用了正确的方式
+        // 2.15.3 中 LaissezFaireSubTypeValidator 仍然可用，但更推荐使用 BasicPolymorphicTypeValidator
+        PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
+                .allowIfSubType("com.pickle.")      // 允许你的项目包名下的类
+                .allowIfSubType("java.util.")
+                .allowIfSubType("java.lang.")
+                .build();
+
+        objectMapper.activateDefaultTyping(
+                ptv,                                 // 使用更安全的验证器
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY
+        );
+
+        // 注册 Java 8 时间模块
+        objectMapper.registerModule(new JavaTimeModule());
+
+        return objectMapper;
+    }
+
     @Bean
-    @Primary  // 如果有多个RedisTemplate，优先使用这个
+    @Primary
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
 
-        // ---------- 修复1：使用新的序列化方式，避免过时方法 ----------
-        // 创建并配置ObjectMapper
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        // 设置可见性（保留你的原配置）
-        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-
-        // 修复：使用新的方法替代过时的 enableDefaultTyping
-        objectMapper.activateDefaultTyping(
-                LaissezFaireSubTypeValidator.instance,  // 使用宽松的子类型验证器
-                ObjectMapper.DefaultTyping.NON_FINAL,   // 对所有非final类型启用类型信息
-                JsonTypeInfo.As.PROPERTY                 // 类型信息作为属性存储
-        );
-
-        // 新增：支持Java 8时间类型（LocalDateTime等）
-        objectMapper.registerModule(new JavaTimeModule());
-
-        // 使用 GenericJackson2JsonRedisSerializer（比 Jackson2JsonRedisSerializer 更灵活）
+        // 创建序列化器
         GenericJackson2JsonRedisSerializer serializer =
-                new GenericJackson2JsonRedisSerializer(objectMapper);
-        // ---------------------------------------------------------
-
-        // 使用 StringRedisSerializer 来序列化和反序列化 redis 的 key 值
+                new GenericJackson2JsonRedisSerializer(createObjectMapper());
         StringRedisSerializer stringSerializer = new StringRedisSerializer();
 
         // 设置序列化方式
@@ -68,24 +78,14 @@ public class RedisConfig {
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory factory) {
-        // ---------- 修复2：与RedisTemplate保持一致 ----------
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        objectMapper.activateDefaultTyping(
-                LaissezFaireSubTypeValidator.instance,
-                ObjectMapper.DefaultTyping.NON_FINAL,
-                JsonTypeInfo.As.PROPERTY
-        );
-        objectMapper.registerModule(new JavaTimeModule());
-
+        // 使用相同的序列化配置
         GenericJackson2JsonRedisSerializer serializer =
-                new GenericJackson2JsonRedisSerializer(objectMapper);
-        // ----------------------------------------------------
+                new GenericJackson2JsonRedisSerializer(createObjectMapper());
 
-        // 配置缓存序列化
+        // 配置缓存
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(30))  // 设置缓存过期时间
-                .disableCachingNullValues()        // 不缓存空值
+                .entryTtl(Duration.ofMinutes(30))
+                .disableCachingNullValues()
                 .serializeKeysWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer())
                 )
@@ -93,7 +93,6 @@ public class RedisConfig {
                         RedisSerializationContext.SerializationPair.fromSerializer(serializer)
                 );
 
-        // 简化版的CacheManager构建
         return RedisCacheManager.builder(factory)
                 .cacheDefaults(config)
                 .build();

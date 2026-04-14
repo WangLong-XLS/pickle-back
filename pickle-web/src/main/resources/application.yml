@@ -39,8 +39,8 @@ spring:
 
 logging:
   level:
-    root: DEBUG
-    org.springframework.web: DEBUG
+    root: INFO
+    org.springframework.web: INFO
   # 设置日志文件输出路径
   file:
     name: logs/springboot-app.log
