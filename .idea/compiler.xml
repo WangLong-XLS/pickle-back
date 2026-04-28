@@ -11,8 +11,8 @@
           <entry name="$PROJECT_DIR$/../../../maven/repository/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
         <module name="pickle-sys" />
-        <module name="pickle-web" />
         <module name="pickle-utils" />
+        <module name="pickle-web" />
       </profile>
     </annotationProcessing>
   </component>

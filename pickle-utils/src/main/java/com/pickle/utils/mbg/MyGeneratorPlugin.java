@@ -15,6 +15,7 @@ import java.util.*;
 
 import static org.mybatis.generator.internal.util.StringUtility.stringHasValue;
 
+
 /**
  * 字段和类生成时，会调用PluginAdapter中的方法，所以可以按需求重写对应的方法
  */
