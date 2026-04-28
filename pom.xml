@@ -21,6 +21,7 @@
         <module>pickle-web</module>
         <module>pickle-utils</module>
         <module>pickle-sys</module>
+        <module>pickle-agent</module>
     </modules>
 
     <properties>

@@ -13,11 +13,13 @@
         <module name="pickle-sys" />
         <module name="pickle-utils" />
         <module name="pickle-web" />
+        <module name="pickle-agent" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="pickle-agent" options="-parameters" />
       <module name="pickle-back" options="-parameters" />
       <module name="pickle-sys" options="-parameters" />
       <module name="pickle-utils" options="-parameters" />

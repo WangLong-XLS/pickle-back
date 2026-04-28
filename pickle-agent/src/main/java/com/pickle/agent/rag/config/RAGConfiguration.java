@@ -1,4 +1,4 @@
-package com.pickle.sys.rag.config;
+package com.pickle.agent.rag.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;

@@ -1,6 +1,6 @@
-package com.pickle.sys.controller;
+package com.pickle.agent.controller;
 
-import com.pickle.sys.service.IRAGAnswerService;
+import com.pickle.agent.service.IRAGAnswerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

@@ -1,6 +1,7 @@
-package com.pickle.sys.service.impl;
+package com.pickle.agent.service.impl;
 
-import com.pickle.sys.service.IRAGAnswerService;
+import com.pickle.agent.service.IMemoryService;
+import com.pickle.agent.service.IRAGAnswerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
@@ -22,6 +23,7 @@ public class RAGAnswerService implements IRAGAnswerService {
     private final ChatClient llmOnlyChatClient;
     private final double similarityThreshold;
     private final boolean fallbackToLLM;
+    private final IMemoryService memoryService;
 
     // 手动编写构造函数，使用 @Qualifier
     public RAGAnswerService(
@@ -29,18 +31,21 @@ public class RAGAnswerService implements IRAGAnswerService {
             VectorStore vectorStore,
             @Qualifier("llmOnlyChatClient") ChatClient llmOnlyChatClient,
             @Value("${knowledge.similarity.threshold:0.65}") double similarityThreshold,
-            @Value("${knowledge.fallback.llm.enabled:true}") boolean fallbackToLLM
+            @Value("${knowledge.fallback.llm.enabled:true}") boolean fallbackToLLM,
+            IMemoryService memoryService
     ) {
         this.ragChatClient = ragChatClient;
         this.vectorStore = vectorStore;
         this.llmOnlyChatClient = llmOnlyChatClient;
         this.similarityThreshold = similarityThreshold;
         this.fallbackToLLM = fallbackToLLM;
+        this.memoryService = memoryService;
     }
 
 
     /**
      * 基于知识库回答用户问题
+     *
      * @param userQuestion 用户问题
      * @return AI 生成的答案
      */
@@ -48,6 +53,26 @@ public class RAGAnswerService implements IRAGAnswerService {
     public String askQuestion(String userQuestion) {
         log.info("用户问题: {}", userQuestion);
 
+        // 1. 检索历史记忆
+        String memoryContext = memoryService.retrieveMemories("123456789", userQuestion);
+        log.info("记忆上下文: {}", memoryContext);
+
+        // 2. 增强用户问题
+        String enhancedQuestion = userQuestion;
+        if (!memoryContext.isEmpty()) {
+            enhancedQuestion = "【历史对话】\n" + memoryContext + "\n【当前问题】\n" + userQuestion;
+            log.info("使用增强后的问题");
+        }
+
+        // 3. 调用原有 RAG/LLM 逻辑
+        String answer = originalAskLogic(enhancedQuestion);
+
+        // 4. 存储本次对话记忆
+        memoryService.storeMemory("123456789", userQuestion, answer);
+        return answer;
+    }
+
+    private String originalAskLogic(String userQuestion) {
         // 1. 先检索向量库
         SearchRequest request = SearchRequest.builder()
                 .query(userQuestion)
@@ -88,10 +113,10 @@ public class RAGAnswerService implements IRAGAnswerService {
      */
     private String llmFallbackAnswer(String userQuestion) {
         String systemPrompt = """
-            你是智能助手，当前问题不在现有知识库范围内。
-            请用中文自然回答用户问题，但需在回答末尾添加提示：
-            "（注意：当前回答基于通用知识，非本系统知识库内容）"
-            """;
+                你是智能助手，当前问题不在现有知识库范围内。
+                请用中文自然回答用户问题，但需在回答末尾添加提示：
+                "（注意：当前回答基于通用知识，非本系统知识库内容）"
+                """;
 
         return llmOnlyChatClient.prompt()
                 .system(systemPrompt)
@@ -105,13 +130,13 @@ public class RAGAnswerService implements IRAGAnswerService {
      */
     private String noKnowledgeFallback(String userQuestion) {
         return String.format("""
-            抱歉，我目前的知识库中没有关于「%s」的相关信息。
-            
-            建议：
-            1. 换个方式描述你的问题
-            2. 上传相关文档后重试
-            3. 联系管理员补充知识库内容
-            """, userQuestion);
+                抱歉，我目前的知识库中没有关于「%s」的相关信息。
+                
+                建议：
+                1. 换个方式描述你的问题
+                2. 上传相关文档后重试
+                3. 联系管理员补充知识库内容
+                """, userQuestion);
     }
 
 
@@ -125,7 +150,7 @@ public class RAGAnswerService implements IRAGAnswerService {
                 .user(userQuestion)
                 .advisors(advisor -> advisor.param(
                         QuestionAnswerAdvisor.FILTER_EXPRESSION,
-                    "category == '情感类'"
+                        "category == '情感类'"
                 ))
                 .call()
                 .content();
@@ -139,8 +164,8 @@ public class RAGAnswerService implements IRAGAnswerService {
         String answer = ragChatClient.prompt()
                 .user(userQuestion)
                 .advisors(advisor -> advisor.param(
-                    QuestionAnswerAdvisor.FILTER_EXPRESSION,
-                    String.format("docName == '%s'", docName)
+                        QuestionAnswerAdvisor.FILTER_EXPRESSION,
+                        String.format("docName == '%s'", docName)
                 ))
                 .call()
                 .content();

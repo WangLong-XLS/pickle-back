@@ -1,7 +1,8 @@
-package com.pickle.sys.service.impl;
+package com.pickle.agent.service.impl;
 
-import com.pickle.sys.rag.MarkdownHierarchicalSplitter;
-import com.pickle.sys.service.IDocumentVectorService;
+
+import com.pickle.agent.rag.MarkdownHierarchicalSplitter;
+import com.pickle.agent.service.IDocumentVectorService;
 import com.pickle.utils.uuid.UUIDUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

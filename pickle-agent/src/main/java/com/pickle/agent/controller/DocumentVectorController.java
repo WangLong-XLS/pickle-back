@@ -1,6 +1,6 @@
-package com.pickle.sys.controller;
+package com.pickle.agent.controller;
 
-import com.pickle.sys.service.IDocumentVectorService;
+import com.pickle.agent.service.IDocumentVectorService;
 import com.pickle.utils.exception.BizException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

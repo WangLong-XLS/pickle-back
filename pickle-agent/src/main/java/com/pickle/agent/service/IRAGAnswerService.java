@@ -1,4 +1,4 @@
-package com.pickle.sys.service;
+package com.pickle.agent.service;
 
 public interface IRAGAnswerService {
     String askQuestion(String question);
