@@ -31,6 +31,18 @@
         </dependency>
 
         <dependency>
+            <groupId>com.pickle</groupId>
+            <artifactId>pickle-agent</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.pickle</groupId>
+            <artifactId>pickle-procedure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
         </dependency>

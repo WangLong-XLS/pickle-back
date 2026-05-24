@@ -1,12 +1,11 @@
 package com.pickle.agent.service.impl;
 
-import com.pickle.sys.service.IMemoryService;
+import com.pickle.agent.service.IMemoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
@@ -17,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Service
+//@Service
 @Slf4j
 public class MemoryService implements IMemoryService {
     
@@ -34,9 +33,9 @@ public class MemoryService implements IMemoryService {
 
     // 存储对话记忆（带去重）
     @Override
-    public void storeMemory(String userId, String userMessage, String assistantMessage) {
+    public void storeMemory(String userId, String keyInfo, String assistantMessage) {
         // 1. 提取关键信息（而不是存储完整对话）
-        String keyInfo = extractKeyInfo(userMessage, assistantMessage);
+//        String keyInfo = extractKeyInfo(userMessage, assistantMessage);
 
         // 如果没有提取到关键信息，就不存储
         if (keyInfo == null) {
@@ -82,7 +81,7 @@ public class MemoryService implements IMemoryService {
         }
 
         // 5. 不重复，存储新记忆
-        Document memory = new Document(keyInfo);  // 只存储关键信息，不存完整对话
+        Document memory = new Document(keyInfo +"\n" +assistantMessage);  // 只存储关键信息，不存完整对话
         memory.getMetadata().put("userId", userId);
         memory.getMetadata().put("timestamp", System.currentTimeMillis());
         memory.getMetadata().put("type", "对话记忆");
@@ -169,7 +168,10 @@ public class MemoryService implements IMemoryService {
                     .call()
                     .content();
 
-            boolean isDuplicate = "true".equalsIgnoreCase(result.trim());
+            boolean isDuplicate = false;
+            if (result != null) {
+                isDuplicate = "true".equalsIgnoreCase(result.trim());
+            }
             log.info("LLM判断重复结果: {} - 已有: {}, 新: {}", isDuplicate, existingText, newText);
             return isDuplicate;
 
@@ -192,14 +194,15 @@ public class MemoryService implements IMemoryService {
         vectorStore.delete(List.of(memoryId));
 
         // 创建新记录（更新时间戳）
-        Document updated = new Document(content);
-        updated.getMetadata().put("userId", userId);
-        updated.getMetadata().put("timestamp", System.currentTimeMillis());
-        updated.getMetadata().put("type", "对话记忆");
-        updated.getMetadata().put("updated", true);
-
-        vectorStore.add(List.of(updated));
-        log.info("更新记忆时间戳: {}", content);
+        if (content != null) {
+            Document updated = new Document(content);
+            updated.getMetadata().put("userId", userId);
+            updated.getMetadata().put("timestamp", System.currentTimeMillis());
+            updated.getMetadata().put("type", "对话记忆");
+            updated.getMetadata().put("updated", true);
+            vectorStore.add(List.of(updated));
+            log.info("更新记忆时间戳: {}", content);
+        }
     }
 
     // 检索相关记忆（用于新对话）

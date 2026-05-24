@@ -9,10 +9,14 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @MapperScan({
-        "com.pickle.sys.mapper"
+        "com.pickle.sys.mapper",
+        "com.pickle.procedure.mapper",
+        "com.pickle.agent.mapper"
 })
 @ComponentScan(basePackages = {
+        "com.pickle.agent",
         "com.pickle.utils",
+        "com.pickle.procedure",
         "com.pickle.web",
         "com.pickle.sys"
 })

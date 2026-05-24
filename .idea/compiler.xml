@@ -13,6 +13,7 @@
         <module name="pickle-sys" />
         <module name="pickle-utils" />
         <module name="pickle-web" />
+        <module name="pickle-procedure" />
         <module name="pickle-agent" />
       </profile>
     </annotationProcessing>
@@ -21,6 +22,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="pickle-agent" options="-parameters" />
       <module name="pickle-back" options="-parameters" />
+      <module name="pickle-procedure" options="-parameters" />
       <module name="pickle-sys" options="-parameters" />
       <module name="pickle-utils" options="-parameters" />
       <module name="pickle-web" options="-parameters" />

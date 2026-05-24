@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
@@ -16,7 +14,7 @@ import javax.sql.DataSource;
 /**
  * PostgreSQL 数据源配置（用于向量存储）
  */
-@Configuration
+//@Configuration
 public class PgVectorDataSourceConfig {
 
     /**
@@ -32,7 +30,6 @@ public class PgVectorDataSourceConfig {
      * JdbcTemplate for PostgreSQL
      */
     @Bean(name = "pgVectorJdbcTemplate")
-    @Primary
     public JdbcTemplate pgVectorJdbcTemplate(
             @Qualifier("pgVectorDataSource") DataSource pgVectorDataSource) {
         return new JdbcTemplate(pgVectorDataSource);
