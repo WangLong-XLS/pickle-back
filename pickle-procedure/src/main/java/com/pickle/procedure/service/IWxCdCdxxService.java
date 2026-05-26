@@ -7,4 +7,7 @@ import java.util.List;
 
 public interface IWxCdCdxxService extends IBaseService<WxCdCdxx> {
     List<WxCdCdxx> selectCdList(WxCdCdxx wxCdCdxx);
+
+    List<WxCdCdxx> queryPageList(WxCdCdxx wxCdCdxx);
+
 }

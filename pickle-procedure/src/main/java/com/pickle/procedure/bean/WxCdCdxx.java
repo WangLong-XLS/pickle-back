@@ -1,11 +1,12 @@
 package com.pickle.procedure.bean;
 
 import com.pickle.utils.base.BaseBean;
-import java.io.Serializable;
-import java.math.BigDecimal;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
 * @ClassName: WxCdCdxx
@@ -30,7 +31,6 @@ public class WxCdCdxx extends BaseBean implements Serializable {
     /**
      * 场地规定人数
      */
-    @Length(max = 28, message = "场地规定人数长度不能超过28")
     private BigDecimal cdGdRs;
 
     /**
@@ -40,4 +40,6 @@ public class WxCdCdxx extends BaseBean implements Serializable {
     private String bz;
 
     private static final long serialVersionUID = 1L;
+
+    private List<String> cdxxUuidIn;
 }

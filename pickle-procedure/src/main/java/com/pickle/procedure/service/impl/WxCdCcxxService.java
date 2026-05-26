@@ -19,4 +19,10 @@ public class WxCdCcxxService extends BaseService<WxCdCcxx> implements IWxCdCcxxS
         List<WxCdCcxx> list = wxCdCcxxMapper.selectCcList(wxCdCcxx);
         return list;
     }
+
+    @Override
+    public List<WxCdCcxx> queryPageList(WxCdCcxx wxCdCcxx) {
+        List<WxCdCcxx> list = wxCdCcxxMapper.selectCcList(wxCdCcxx);
+        return list;
+    }
 }

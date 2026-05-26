@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.Length;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
 * @ClassName: WxCdCcxx
@@ -37,7 +38,6 @@ public class WxCdCcxx extends BaseBean implements Serializable {
     /**
      * 场地单价
      */
-    @Length(max = 28, message = "场地单价长度不能超过28")
     private BigDecimal cdDj;
 
     /**
@@ -53,6 +53,8 @@ public class WxCdCcxx extends BaseBean implements Serializable {
     private String pxh;
 
     private static final long serialVersionUID = 1L;
+
+    private List<String> ccyyUuidIn;
 
     /**
      * 场地名称

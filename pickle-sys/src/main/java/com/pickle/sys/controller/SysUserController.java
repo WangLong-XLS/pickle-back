@@ -21,17 +21,19 @@ public class SysUserController extends BaseController<SysUser> {
 
     @RequestMapping("/save")
     public void save(@Valid @RequestBody SysUser sysUser) {
-        sysUserService.save(sysUser);
+        sysUserService.saveData(sysUser);
     }
 
     @RequestMapping("/update")
     public void update(@Valid @RequestBody SysUser sysUser) {
-        sysUserService.update(sysUser);
+        sysUserService.updateData(sysUser);
     }
 
     @RequestMapping("/delete")
     public void delete(@RequestBody SysUser sysUser) {
-        sysUserService.deleteByPrimaryKey(sysUser.getUserUuid());
+        if (!sysUser.getUserUuidIn().isEmpty()){
+            sysUserService.batchDeleteByPrimaryKey(sysUser.getUserUuidIn());
+        }
     }
 
     @RequestMapping("/login")

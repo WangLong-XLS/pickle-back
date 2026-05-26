@@ -4,11 +4,19 @@ import com.pickle.procedure.bean.WxCdYyjl;
 import com.pickle.procedure.mapper.WxCdYyjlMapper;
 import com.pickle.procedure.service.IWxCdYyjlService;
 import com.pickle.utils.base.BaseService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
+@RequiredArgsConstructor
 public class WxCdYyjlService extends BaseService<WxCdYyjl> implements IWxCdYyjlService {
-    @Autowired
-    private WxCdYyjlMapper wxCdYyjlMapper;
+    private final WxCdYyjlMapper wxCdYyjlMapper;
+
+    @Override
+    public List<WxCdYyjl> queryPageList(WxCdYyjl wxCdYyjl) {
+        List<WxCdYyjl> list = wxCdYyjlMapper.selectListByBean(wxCdYyjl);
+        return list;
+    }
 }

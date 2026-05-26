@@ -5,6 +5,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
 * @ClassName: SysUser
@@ -65,4 +66,18 @@ public class SysUser extends BaseBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String token;
+
+    /**
+     * 用户idIn
+     */
+    private List<String> userUuidIn;
+
+    //用户性别名称
+    private String userSexName;
+
+    //机构名称
+    private String orgName;
+
+    //角色名称
+    private String roleName;
 }

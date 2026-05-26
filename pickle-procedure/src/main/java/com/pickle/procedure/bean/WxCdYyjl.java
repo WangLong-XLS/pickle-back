@@ -1,12 +1,13 @@
 package com.pickle.procedure.bean;
 
 import com.pickle.utils.base.BaseBean;
+import lombok.Data;
+import org.hibernate.validator.constraints.Length;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import javax.validation.constraints.NotNull;
-import lombok.Data;
-import org.hibernate.validator.constraints.Length;
+import java.util.List;
 
 /**
 * @ClassName: WxCdYyjl
@@ -42,8 +43,9 @@ public class WxCdYyjl extends BaseBean implements Serializable {
     /**
      * 预约人数
      */
-    @Length(max = 28, message = "预约人数长度不能超过28")
     private BigDecimal yyRs;
 
     private static final long serialVersionUID = 1L;
+
+    private List<String> yyjlUuidIn;
 }

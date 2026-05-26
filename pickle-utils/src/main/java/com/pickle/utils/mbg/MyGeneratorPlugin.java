@@ -145,6 +145,8 @@ public class MyGeneratorPlugin extends PluginAdapter {
         //添加@RequestMapping注解，并引入相应的类
         clazz.addImportedType(new FullyQualifiedJavaType("org.springframework.web.bind.annotation.RequestMapping"));
         clazz.addAnnotation("@RequestMapping(\"/" + firstCharToLowCase(modelName) + "\")");
+        clazz.addImportedType(new FullyQualifiedJavaType("lombok.RequiredArgsConstructor"));
+        clazz.addAnnotation("@RequiredArgsConstructor");
 
         //引入controller的父类和model，并添加泛型
         if (stringHasValue(superController)) {
@@ -165,11 +167,11 @@ public class MyGeneratorPlugin extends PluginAdapter {
 
         Field daoField = new Field(result, new FullyQualifiedJavaType(serviceName));
         clazz.addImportedType(new FullyQualifiedJavaType(serviceName));
-        clazz.addImportedType(new FullyQualifiedJavaType("org.springframework.beans.factory.annotation.Autowired"));
-        //描述成员属性 的注解
-        daoField.addAnnotation("@Autowired");
+
         //描述成员属性修饰符
         daoField.setVisibility(JavaVisibility.PRIVATE);
+        // 添加 final 修饰符
+        daoField.setFinal(true);
         clazz.addField(daoField);
 
         clazz.addImportedType(new FullyQualifiedJavaType("org.springframework.web.bind.annotation.RequestBody"));
@@ -248,15 +250,16 @@ public class MyGeneratorPlugin extends PluginAdapter {
         }
         clazz.addImportedType(new FullyQualifiedJavaType("org.springframework.stereotype.Service"));
         clazz.addAnnotation("@Service");
+        clazz.addImportedType(new FullyQualifiedJavaType("lombok.RequiredArgsConstructor"));
+        clazz.addAnnotation("@RequiredArgsConstructor");
 
         String daoFieldType = introspectedTable.getMyBatis3JavaMapperType();
         String daoFieldName = firstCharToLowCase(daoFieldType.substring(daoFieldType.lastIndexOf(".") + 1));
         //描述类的成员属性
         Field daoField = new Field(daoFieldName, new FullyQualifiedJavaType(daoFieldType));
         clazz.addImportedType(new FullyQualifiedJavaType(daoFieldType));
-        clazz.addImportedType(new FullyQualifiedJavaType("org.springframework.beans.factory.annotation.Autowired"));
-        //描述成员属性 的注解
-        daoField.addAnnotation("@Autowired");
+        // 添加 final 修饰符
+        daoField.setFinal(true);
         //描述成员属性修饰符
         daoField.setVisibility(JavaVisibility.PRIVATE);
         clazz.addField(daoField);
@@ -492,7 +495,7 @@ public class MyGeneratorPlugin extends PluginAdapter {
 
         // 到入需要注解的包
         topLevelClass.addImportedType("org.hibernate.validator.constraints.Length");
-        topLevelClass.addImportedType("javax.validation.constraints.NotNull");
+        topLevelClass.addImportedType("jakarta.validation.constraints.NotNull");
 
         topLevelClass.addImportedType("lombok.Data");
         topLevelClass.addAnnotation("@Data");
@@ -563,9 +566,9 @@ public class MyGeneratorPlugin extends PluginAdapter {
 
                     if (!column.getActualColumnName().equals(actualColumnName)){
                         String[] split = field.getType().toString().split("\\.");
-                        if (!split[split.length-1].equals("Date")){
+                        if (!split[split.length-1].equals("Date") && !split[split.length-1].equals("BigDecimal")){
                             if (!column.isNullable()){
-                                field.addJavaDocLine("@NonNull");
+                                field.addJavaDocLine("@NotNull(message = \"" +columnComment + "不能为空\")");
                             }
                             field.addAnnotation("@Length(max = " +length +", message = \"" +columnComment +"长度不能超过" +length +"\")");
        /*                     @Digits(integer = 8, fraction = 2, message = "整数部分最多8位，小数部分最多8位")

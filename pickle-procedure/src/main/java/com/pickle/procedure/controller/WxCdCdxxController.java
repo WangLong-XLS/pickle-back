@@ -1,8 +1,11 @@
 package com.pickle.procedure.controller;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.pickle.procedure.bean.WxCdCdxx;
 import com.pickle.procedure.service.IWxCdCdxxService;
 import com.pickle.utils.base.BaseController;
+import com.pickle.utils.uuid.UUIDUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +22,7 @@ public class WxCdCdxxController extends BaseController<WxCdCdxx> {
 
     @RequestMapping("/save")
     public void save(@Valid @RequestBody WxCdCdxx wxCdCdxx) {
+        wxCdCdxx.setCdxxUuid(UUIDUtil.newUUID());
         wxCdCdxxService.save(wxCdCdxx);
     }
 
@@ -35,5 +39,11 @@ public class WxCdCdxxController extends BaseController<WxCdCdxx> {
     @RequestMapping("/selectCdList")
     public List<WxCdCdxx> selectCdList(@RequestBody WxCdCdxx wxCdCdxx) {
         return wxCdCdxxService.selectCdList(wxCdCdxx);
+    }
+
+    @RequestMapping("/queryPageList")
+    public PageInfo<WxCdCdxx> queryPageList(@RequestBody WxCdCdxx wxCdCdxx) {
+        PageHelper.startPage(wxCdCdxx.getPageNum(), wxCdCdxx.getPageSize());
+        return wxCdCdxxService.getPage(wxCdCdxxService.queryPageList(wxCdCdxx), wxCdCdxx);
     }
 }

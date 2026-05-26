@@ -31,7 +31,7 @@ public class CorsConfig {
                 "content-disposition",
                 "Authorization",
                 "Cache-Control",
-                "token"  // 添加 token 响应头
+                "Token"  // 添加 token 响应头
         ));
 
         source.registerCorsConfiguration("/**", configuration);
