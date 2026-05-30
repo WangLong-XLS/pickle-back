@@ -1,27 +1,29 @@
 package com.pickle.utils.enums;
 
+import com.power.common.interfaces.IMessage;
+
 /**
  * 是否枚举
  */
-public enum YesOrNo {
-    YES("Y", "是"),
-    NO("N", "否");
+public enum YesOrNo implements IMessage {
+    YES("Y","是"),
+    NO("N","否");
 
-    String code;
-    String msg;
+    final String code;
+    final String msg;
 
     YesOrNo(String code, String msg) {
         this.code = code;
         this.msg = msg;
     }
 
-    // 根据 code 获取枚举
-    public static YesOrNo getByCode(String code) {
-        for (YesOrNo value : values()) {
-            if (value.code.equals(code)) {
-                return value;
-            }
-        }
-        return null;
+    @Override
+    public String getCode() {
+        return this.code;
+    }
+
+    @Override
+    public String getMessage() {
+        return this.msg;
     }
 }

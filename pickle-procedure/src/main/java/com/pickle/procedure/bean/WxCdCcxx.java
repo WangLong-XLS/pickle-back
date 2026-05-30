@@ -68,4 +68,9 @@ public class WxCdCcxx extends BaseBean implements Serializable {
 
     //当前日期
     private Date dqRq;
+
+    /**
+     * 是否黄金天名称
+     */
+    private String hjtBzMc;
 }

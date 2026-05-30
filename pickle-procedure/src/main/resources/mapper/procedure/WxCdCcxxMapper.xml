@@ -481,4 +481,25 @@
         t1.ZF_BZ = 'N'
         AND t1.HJT_BZ = 'N'
   </select>
+
+  <select id="queryPageList" resultMap="BaseResultMapDTO" parameterType="com.pickle.procedure.bean.WxCdCcxx">
+    SELECT
+        t1.CCYY_UUID, t1.CDXX_UUID, t1.CC_SD, t1.CD_DJ, t1.HJT_BZ, t1.PXH, t1.CJ_RY_DM, t1.CJ_SJ, t1.XG_RY_DM, t1.XG_SJ,
+        t1.SJGS_JG_DM, t1.ZF_RY_DM, t1.ZF_SJ, t2.CD_MC, t2.CD_GD_RS
+    FROM
+        wx_cd_ccxx t1
+        LEFT JOIN wx_cd_cdxx t2 ON t1.CDXX_UUID = t2.CDXX_UUID
+        AND t2.ZF_BZ = 'N'
+    WHERE
+        t1.ZF_BZ = 'N'
+        <if test="cdxxUuid != null and cdxxUuid != ''">
+          AND t1.CDXX_UUID = #{cdxxUuid}
+        </if>
+        <if test="ccSd != null and ccSd != ''">
+          AND t1.CC_SD = #{ccSd}
+        </if>
+        <if test="hjtBz != null and hjtBz != ''">
+          AND t1.HJT_BZ = #{hjtBz}
+        </if>
+  </select>
 </mapper>

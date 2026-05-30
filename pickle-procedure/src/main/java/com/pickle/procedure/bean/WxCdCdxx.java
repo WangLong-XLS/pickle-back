@@ -42,4 +42,6 @@ public class WxCdCdxx extends BaseBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private List<String> cdxxUuidIn;
+
+    private List<String> cdMcIn;
 }

@@ -5,8 +5,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.github.pagehelper.util.StringUtil;
 import com.pickle.procedure.bean.WxUser;
+import com.pickle.procedure.jwt.JwtTokenUtils;
 import com.pickle.procedure.mapper.WxUserMapper;
 import com.pickle.procedure.service.IWxUserService;
 import com.pickle.sys.bean.GgFj;
@@ -27,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +39,7 @@ public class WxUserService extends BaseService<WxUser> implements IWxUserService
     private final WxUserMapper wxUserMapper;
     private final RedisCacheService redisCacheService;
     private final JwtUtil jwtUtil;
+    private final JwtTokenUtils jwtTokenUtils;
     private final IGgFjService ggFjService;
 
     @Value("${wx.miniapp.appid:}")
@@ -89,11 +94,26 @@ public class WxUserService extends BaseService<WxUser> implements IWxUserService
         }
 
         // 4. 生成 JWT token
-        String token = jwtUtil.generateToken(openId, wxUser.getUserUuid());
-
+        String token = this.getToken(wxUser.getUserUuid(), wxUser.getWxCode());
+        wxUser.setToken(token);
+        redisCacheService.setCache(wxUser.getUserUuid(), wxUser, 60 * 60 * 24 * 30, TimeUnit.SECONDS);
         // 5. 返回用户信息
         wxUser.setToken(token);
         return wxUser;
+    }
+
+    private String getToken(String userId, String wxCode) {
+        Date dateTime = DateUtils.getSecondsLastTime(60 * 60 * 24 * 30);
+
+        // 生成 Token 的代码示例
+        String token = JWT.create()
+                .withAudience(userId)  // 添加这一行，将 userId 存入 audience
+                .withExpiresAt(dateTime)
+                .sign(Algorithm.HMAC256(wxCode));
+
+        log.info("token已生成：" +token);
+        log.info(DateUtils.date2StringTime(dateTime, DateUtils.DATE_FORMAT_SECOND) +"之后过期");
+        return  token;
     }
 
     @Override

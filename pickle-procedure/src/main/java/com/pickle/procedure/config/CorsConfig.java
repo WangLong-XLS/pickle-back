@@ -1,4 +1,4 @@
-package com.pickle.sys.config;
+package com.pickle.procedure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

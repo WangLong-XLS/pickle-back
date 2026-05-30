@@ -1,4 +1,4 @@
-package com.pickle.sys.jwt;
+package com.pickle.procedure.jwt;
 
 
 import com.auth0.jwt.JWT;
@@ -6,6 +6,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.github.pagehelper.util.StringUtil;
+import com.pickle.procedure.bean.WxUser;
 import com.pickle.sys.bean.SysUser;
 import com.pickle.utils.exception.TokenException;
 import com.pickle.utils.redis.RedisCacheService;
@@ -35,12 +36,13 @@ public class JwtTokenUtils implements HandlerInterceptor {
         }
 
         String userId = JWT.decode(token).getAudience().getFirst();
-        SysUser user = (SysUser) redisCacheService.getCache(userId);
-        if (user == null){
+        Object cache = redisCacheService.getCache(userId);
+        if (cache == null){
             throw new TokenException("该用户信息不存在，请重新登录");
         }
 
-        JWTVerifier build = JWT.require(Algorithm.HMAC256(user.getUserPassword())).build();
+        String str = getString(cache);
+        JWTVerifier build = JWT.require(Algorithm.HMAC256(str)).build();
         try {
             build.verify(token);
         } catch (JWTVerificationException e) {
@@ -49,6 +51,21 @@ public class JwtTokenUtils implements HandlerInterceptor {
 
         log.info("token验证通过，以" +request.getMethod() +"方式请求：" +request.getRequestURI());
         return true;  // 如果验证成功，继续处理请求
+    }
+
+    private static String getString(Object cache) {
+        String str;
+        String classBean = cache.getClass().getName();
+        if (classBean.equals(SysUser.class.getName())) {
+            SysUser user = (SysUser) cache;
+            str = user.getUserPassword();
+        }else if (classBean.equals(WxUser.class.getName())) {
+            WxUser wxUser = (WxUser) cache;
+            str = wxUser.getWxCode();
+        }else {
+            throw new TokenException("token解析出现问题，请联系管理员");
+        }
+        return str;
     }
 
 

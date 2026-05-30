@@ -403,7 +403,8 @@
     <include refid="Base_Where" />
     <include refid="Base_OrderBy" />
   </select>
-  <delete id="deleteByBean" parameterType="com.pickle.procedure.bean.WxCdCdxx">
+
+    <delete id="deleteByBean" parameterType="com.pickle.procedure.bean.WxCdCdxx">
     DELETE FROM wx_cd_cdxx
     <include refid="Base_Where" />
   </delete>
@@ -411,4 +412,25 @@
     DELETE FROM wx_cd_cdxx
     <include refid="Base_Where" />
   </delete>
+
+  <select id="selectListCheckout" resultMap="BaseResultMap" parameterType="com.pickle.procedure.bean.WxCdCdxx">
+    SELECT
+        <include refid="Base_Column_List" />
+    FROM
+        wx_cd_cdxx
+    WHERE
+        ZF_BZ = 'N'
+        <if test="cdxxUuid != null and cdxxUuid != ''">
+          AND CDXX_UUID = #{cdxxUuid}
+        </if>
+        <if test="cdMc != null and cdMc != ''">
+          AND CD_MC = #{cdMc}
+        </if>
+        <if test="cdMcIn != null and cdMcIn.size() != 0">
+          AND CD_MC IN
+          <foreach close=")" collection="cdMcIn" index="idx" item="item" open="(" separator=",">
+            #{item}
+          </foreach>
+        </if>
+  </select>
 </mapper>

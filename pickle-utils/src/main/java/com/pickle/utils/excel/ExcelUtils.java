@@ -23,6 +23,21 @@ public class ExcelUtils {
     private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors() + 1;
     private static final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
+    public static void easyExcelExport(HttpServletResponse response,
+                                   String fileName,
+                                   List<?> dataList,  // 使用通配符
+                                   Class<?> clazz,     // 使用通配符
+                                   List<String> fields) {
+        new ExcelExportBuilder()
+                .response(response)
+                .fileName(fileName)
+                .dataList(dataList)
+                .clazz(clazz)
+                .includeFields(fields)
+                .freezePane(0, 1)
+                .export();
+    }
+
     public static ExcelWriter easyExcelExport(HttpServletResponse response, String fileName){
         try {
             String name = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
@@ -37,17 +52,6 @@ public class ExcelUtils {
         }
     }
 
-    public static ExcelWriter easyExcelExport(HttpServletResponse response){
-        try {
-            response.setCharacterEncoding("utf-8");
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-
-            return EasyExcel.write(response.getOutputStream()).build();
-        } catch (IOException e) {
-            logger.error("操作异常：{}", e.getMessage());
-            throw new RuntimeException(e);
-        }
-    }
 
     /**
      *
