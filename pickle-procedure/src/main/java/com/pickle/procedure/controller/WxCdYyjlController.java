@@ -20,8 +20,7 @@ public class WxCdYyjlController extends BaseController<WxCdYyjl> {
 
     @RequestMapping("/save")
     public void save(@Valid @RequestBody WxCdYyjl wxCdYyjl) {
-        wxCdYyjl.setYyjlUuid(UUIDUtil.newUUID());
-        wxCdYyjlService.save(wxCdYyjl);
+        wxCdYyjlService.saveData(wxCdYyjl);
     }
 
     @RequestMapping("/update")

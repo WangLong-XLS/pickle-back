@@ -8,4 +8,5 @@ import java.util.List;
 public interface WxCdCdxxMapper extends BaseMapper<WxCdCdxx> {
     List<WxCdCdxx> selectListCheckout(WxCdCdxx wxCdCdxx);
 
+    List<WxCdCdxx> selectCdList(WxCdCdxx wxCdCdxx);
 }

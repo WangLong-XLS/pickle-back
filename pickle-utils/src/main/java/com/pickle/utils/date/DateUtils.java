@@ -56,8 +56,7 @@ public class DateUtils {
      */
     public static Date string2Date(String dateString, String pattern) {
         LocalDate localDate = LocalDate.parse(dateString, DateTimeFormatter.ofPattern(pattern));
-        Instant instant = localDate.atStartOfDay().atZone(ZONE_ID).toInstant();
-        return Date.from(instant);
+        return localDate2Date(localDate);
     }
 
 

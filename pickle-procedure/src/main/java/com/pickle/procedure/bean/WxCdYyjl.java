@@ -26,13 +26,13 @@ public class WxCdYyjl extends BaseBean implements Serializable {
     /**
      * 微信用户id
      */
-    @Length(max = 10, message = "微信用户id长度不能超过10")
+    @Length(max = 32, message = "微信用户id长度不能超过32")
     private String userUuid;
 
     /**
      * 场次信息id
      */
-    @Length(max = 20, message = "场次信息id长度不能超过20")
+    @Length(max = 32, message = "场次信息id长度不能超过32")
     private String ccyyUuid;
 
     /**

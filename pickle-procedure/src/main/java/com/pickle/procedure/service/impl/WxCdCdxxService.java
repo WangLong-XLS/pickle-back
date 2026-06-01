@@ -23,7 +23,7 @@ public class WxCdCdxxService extends BaseService<WxCdCdxx> implements IWxCdCdxxS
 
     @Override
     public List<WxCdCdxx> selectCdList(WxCdCdxx wxCdCdxx) {
-        List<WxCdCdxx> list = wxCdCdxxMapper.selectListByBean(wxCdCdxx);
+        List<WxCdCdxx> list = wxCdCdxxMapper.selectCdList(wxCdCdxx);
         return list;
     }
 

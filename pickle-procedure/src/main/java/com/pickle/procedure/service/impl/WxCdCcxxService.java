@@ -4,6 +4,7 @@ import com.pickle.procedure.bean.WxCdCcxx;
 import com.pickle.procedure.mapper.WxCdCcxxMapper;
 import com.pickle.procedure.service.IWxCdCcxxService;
 import com.pickle.utils.base.BaseService;
+import com.pickle.utils.date.DateUtils;
 import com.pickle.utils.enums.YesOrNo;
 import com.pickle.utils.exception.BizException;
 import com.pickle.utils.uuid.UUIDUtil;
@@ -19,6 +20,8 @@ public class WxCdCcxxService extends BaseService<WxCdCcxx> implements IWxCdCcxxS
 
     @Override
     public List<WxCdCcxx> selectCcList(WxCdCcxx wxCdCcxx) {
+        String hjtBz = DateUtils.isWeekend(wxCdCcxx.getDqRq()) ? YesOrNo.YES.getCode() : YesOrNo.NO.getCode();
+        wxCdCcxx.setHjtBz(hjtBz);
         List<WxCdCcxx> list = wxCdCcxxMapper.selectCcList(wxCdCcxx);
         return list;
     }

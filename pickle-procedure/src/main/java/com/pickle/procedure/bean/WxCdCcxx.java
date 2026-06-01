@@ -4,6 +4,7 @@ import com.pickle.utils.base.BaseBean;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -52,6 +53,7 @@ public class WxCdCcxx extends BaseBean implements Serializable {
     @Length(max = 2, message = "排序号长度不能超过2")
     private String pxh;
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private List<String> ccyyUuidIn;
@@ -73,4 +75,9 @@ public class WxCdCcxx extends BaseBean implements Serializable {
      * 是否黄金天名称
      */
     private String hjtBzMc;
+
+    /**
+     * 场次余位
+     */
+    private BigDecimal ccYw;
 }

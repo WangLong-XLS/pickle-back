@@ -433,4 +433,14 @@
           </foreach>
         </if>
   </select>
+
+  <select id="selectCdList" resultMap="BaseResultMap" parameterType="com.pickle.procedure.bean.WxCdCdxx">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM
+    wx_cd_cdxx
+    WHERE
+    ZF_BZ = 'N'
+    ORDER BY CD_MC
+  </select>
 </mapper>
