@@ -16,12 +16,14 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>pickle-back</description>
+    <name>pickle-back 匹克球管理</name>
 
     <modules>
         <module>pickle-web</module>
         <module>pickle-utils</module>
         <module>pickle-sys</module>
         <module>pickle-agent</module>
+        <module>pickle-procedure</module>
     </modules>
 
     <properties>

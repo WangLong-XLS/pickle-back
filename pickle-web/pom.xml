@@ -10,6 +10,8 @@
     </parent>
 
     <artifactId>pickle-web</artifactId>
+    <packaging>jar</packaging>
+    <name>pickle-web 启动模块</name>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -49,11 +51,15 @@
     </dependencies>
 
     <build>
+        <finalName>pickle</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <!-- ✅ 主启动类全路径（根据你的实际情况修改） -->
+                    <mainClass>com.pickle.web.PickleBackApplication</mainClass>
+                    <includeSystemScope>true</includeSystemScope>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
@@ -61,6 +67,13 @@
                         </exclude>
                     </excludes>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

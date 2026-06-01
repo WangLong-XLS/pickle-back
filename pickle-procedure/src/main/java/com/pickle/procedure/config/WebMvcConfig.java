@@ -20,9 +20,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/sysUser/login",      // 排除登录接口
                         "/sysUser/register",   // 排除注册接口
                         "/wxUser/login",   // 排除小程序登录接口
-                        "/swagger-ui/**",   // 排除 Swagger
-                        "/v3/api-docs/**",  // 排除 API 文档
-                        "/doc.html"         // 排除 Knife4j
+                        "/pickle/swagger-ui/**",   // 排除 Swagger
+                        "/pickle/v3/api-docs/**",  // 排除 API 文档
+                        "/pickle/doc.html"         // 排除 Knife4j
                 );
     }
 }

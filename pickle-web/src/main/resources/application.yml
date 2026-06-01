@@ -1,6 +1,7 @@
 # ???? WEB ????
 server:
-  port: 8888
+#  port: 8888
+  port: 8881
   servlet:
     #系统上下文
     context-path: /pickle
@@ -25,7 +26,7 @@ spring:
     enabled: false
   #激活辅助配置文件
   profiles:
-    active: dev
+    active: test
   # 上传文件最大大小
   servlet:
     multipart:
@@ -43,7 +44,7 @@ logging:
     org.springframework.web: INFO
   # 设置日志文件输出路径
   file:
-    name: logs/springboot-app.log
+    name: logs/pickle.log
 
 
 
