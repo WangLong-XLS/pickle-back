@@ -487,6 +487,9 @@
         <if test="hjtBz != null and hjtBz != ''">
           AND t1.HJT_BZ = #{hjtBz}
         </if>
+        <if test="ccyyUuid != null and ccyyUuid != ''">
+          AND t1.CCYY_UUID = #{ccyyUuid}
+        </if>
   </select>
 
   <select id="queryPageList" resultMap="BaseResultMapDTO" parameterType="com.pickle.procedure.bean.WxCdCcxx">

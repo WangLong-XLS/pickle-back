@@ -5,7 +5,6 @@ import com.github.pagehelper.PageInfo;
 import com.pickle.procedure.bean.WxCdYyjl;
 import com.pickle.procedure.service.IWxCdYyjlService;
 import com.pickle.utils.base.BaseController;
-import com.pickle.utils.uuid.UUIDUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,12 +24,14 @@ public class WxCdYyjlController extends BaseController<WxCdYyjl> {
 
     @RequestMapping("/update")
     public void update(@Valid @RequestBody WxCdYyjl wxCdYyjl) {
-        wxCdYyjlService.update(wxCdYyjl);
+        wxCdYyjlService.updateData(wxCdYyjl);
     }
 
     @RequestMapping("/delete")
     public void delete(@RequestBody WxCdYyjl wxCdYyjl) {
-        wxCdYyjlService.deleteByPrimaryKey(wxCdYyjl.getYyjlUuid());
+        if (!wxCdYyjl.getYyjlUuidIn().isEmpty()) {
+            wxCdYyjlService.batchDeleteByPrimaryKey(wxCdYyjl.getYyjlUuidIn());
+        }
     }
 
     @RequestMapping("/queryPageList")

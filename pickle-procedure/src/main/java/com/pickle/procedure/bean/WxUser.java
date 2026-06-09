@@ -5,6 +5,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
 * @ClassName: WxUser
@@ -71,4 +72,14 @@ public class WxUser extends BaseBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String token;
+
+    /**
+     * 用户idIn
+     */
+    private List<String> userUuidIn;
+
+    /**
+     * 用户性别名称
+     */
+    private String userSexMc;
 }

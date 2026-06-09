@@ -10,4 +10,7 @@ public interface IWxCdYyjlService extends IBaseService<WxCdYyjl> {
     List<WxCdYyjl> queryPageList(WxCdYyjl wxCdYyjl);
 
     void saveData(@Valid WxCdYyjl wxCdYyjl);
+
+    void updateData(@Valid WxCdYyjl wxCdYyjl);
+
 }

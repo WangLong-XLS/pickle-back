@@ -47,5 +47,15 @@ public class WxCdYyjl extends BaseBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    //场地预约记录idIn
     private List<String> yyjlUuidIn;
+
+    //微信用户名称
+    private String userName;
+
+    //场次时段
+    private String ccSd;
+
+    //场地名称
+    private String cdMc;
 }

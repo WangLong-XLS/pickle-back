@@ -436,4 +436,36 @@
     DELETE FROM wx_cd_yyjl
     <include refid="Base_Where" />
   </delete>
+
+  <resultMap id="BaseResultMapDTO" type="com.pickle.procedure.bean.WxCdYyjl">
+    <result column="USER_NAME" jdbcType="VARCHAR" property="userName" />
+    <result column="CC_SD" jdbcType="VARCHAR" property="ccSd" />
+    <result column="CD_MC" jdbcType="VARCHAR" property="cdMc" />
+  </resultMap>
+
+  <select id="queryPageList" resultMap="BaseResultMapDTO" parameterType="com.pickle.procedure.bean.WxCdYyjl">
+    SELECT
+        t1.YYJL_UUID, t1.USER_UUID, t1.CCYY_UUID, t1.YY_RQ, t1.YY_RS, t1.CJ_RY_DM, t1.CJ_SJ, t1.XG_RY_DM, t1.XG_SJ,
+        t1.SJGS_JG_DM, t1.ZF_RY_DM, t1.ZF_SJ, t2.USER_NAME, t3.CC_SD, t4.CD_MC
+    FROM
+        wx_cd_yyjl t1
+        LEFT JOIN wx_user t2 ON t1.USER_UUID = t2.USER_UUID
+        AND t2.ZF_BZ = 'N'
+        LEFT JOIN wx_cd_ccxx t3 ON t1.CCYY_UUID = t3.CCYY_UUID
+        AND t3.ZF_BZ = 'N'
+        LEFT JOIN wx_cd_cdxx t4 ON t3.CDXX_UUID = t4.CDXX_UUID
+        AND t4.ZF_BZ = 'N'
+    WHERE
+        t1.ZF_BZ = 'N'
+        <if test="userName != null and userName != ''">
+          AND t2.USER_NAME = #{userName}
+        </if>
+        <if test="cdMc != null and cdMc != ''">
+          AND t4.CD_MC = #{cdMc}
+        </if>
+        <if test="yyRq != null">
+          AND t1.YY_RQ = #{yyRq}
+        </if>
+  </select>
+
 </mapper>

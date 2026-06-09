@@ -541,4 +541,11 @@
     <include refid="Base_Where" />
   </delete>
 
+  <select id="queryPageList" resultMap="BaseResultMap" parameterType="com.pickle.procedure.bean.WxUser">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM wx_user
+    <include refid="Base_Where" />
+    <include refid="Base_OrderBy" />
+  </select>
 </mapper>

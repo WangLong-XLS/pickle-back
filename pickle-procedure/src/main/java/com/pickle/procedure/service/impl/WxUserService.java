@@ -17,6 +17,7 @@ import com.pickle.sys.service.IGgFjService;
 import com.pickle.utils.base.BaseService;
 import com.pickle.utils.constant.StringConstant;
 import com.pickle.utils.date.DateUtils;
+import com.pickle.utils.enums.ManOrWom;
 import com.pickle.utils.exception.BizException;
 import com.pickle.utils.jwt.JwtUtil;
 import com.pickle.utils.redis.RedisCacheService;
@@ -148,5 +149,12 @@ public class WxUserService extends BaseService<WxUser> implements IWxUserService
         wxUser.setUserImage(wjLj);
         wxUserMapper.updateByPrimaryKeySelective(wxUser);
         return wxUser;
+    }
+
+    @Override
+    public List<WxUser> queryPageList(WxUser wxUser) {
+        List<WxUser> list = wxUserMapper.queryPageList(wxUser);
+        list.forEach(e -> e.setUserSexMc(ManOrWom.MAN.getCode().equals(e.getUserSex()) ? ManOrWom.MAN.getMessage() : ManOrWom.WOMAN.getMessage()));
+        return list;
     }
 }

@@ -18,6 +18,8 @@ public class CorsConfig {
 
         // ✅ 修改：允许前端地址（开发环境）
         configuration.addAllowedOrigin("http://localhost:8080");
+        //测试环境
+//        configuration.addAllowedOrigin("http://localhost:8081");
         // 或者允许所有来源（仅开发环境）
         // configuration.addAllowedOriginPattern("*");
 
