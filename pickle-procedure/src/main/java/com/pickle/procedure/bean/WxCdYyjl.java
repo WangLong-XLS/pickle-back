@@ -1,5 +1,6 @@
 package com.pickle.procedure.bean;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pickle.utils.base.BaseBean;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -38,6 +39,7 @@ public class WxCdYyjl extends BaseBean implements Serializable {
     /**
      * 预约日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date yyRq;
 
     /**
@@ -52,6 +54,9 @@ public class WxCdYyjl extends BaseBean implements Serializable {
 
     //微信用户名称
     private String userName;
+
+    //微信用户头像
+    private String userImage;
 
     //场次时段
     private String ccSd;

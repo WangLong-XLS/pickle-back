@@ -28,7 +28,7 @@ public class WxUserController extends BaseController<WxUser> {
 
     @RequestMapping("/update")
     public void update(@Valid @RequestBody WxUser wxUser) {
-        wxUserService.update(wxUser);
+        wxUserService.updateData(wxUser);
     }
 
     @RequestMapping("/delete")

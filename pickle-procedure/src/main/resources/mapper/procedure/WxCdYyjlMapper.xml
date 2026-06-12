@@ -439,6 +439,7 @@
 
   <resultMap id="BaseResultMapDTO" type="com.pickle.procedure.bean.WxCdYyjl">
     <result column="USER_NAME" jdbcType="VARCHAR" property="userName" />
+    <result column="USER_IMAGE" jdbcType="VARCHAR" property="userImage" />
     <result column="CC_SD" jdbcType="VARCHAR" property="ccSd" />
     <result column="CD_MC" jdbcType="VARCHAR" property="cdMc" />
   </resultMap>
@@ -468,4 +469,19 @@
         </if>
   </select>
 
+  <select id="selectYyjlList" resultMap="BaseResultMapDTO">
+    SELECT
+        t1.USER_UUID, SUM( t1.YY_RS ) YY_RS, t2.USER_NAME, t2.USER_IMAGE
+    FROM
+        wx_cd_yyjl t1
+        LEFT JOIN wx_user t2 ON t1.USER_UUID = t2.USER_UUID
+        AND t2.ZF_BZ = 'N'
+    WHERE
+        t1.ZF_BZ = 'N'
+        <if test="yyRq != null">
+          AND t1.YY_RQ = #{yyRq}
+        </if>
+    GROUP BY
+        t1.USER_UUID, t2.USER_NAME, t2.USER_IMAGE
+  </select>
 </mapper>

@@ -13,4 +13,5 @@ public interface IWxCdYyjlService extends IBaseService<WxCdYyjl> {
 
     void updateData(@Valid WxCdYyjl wxCdYyjl);
 
+    List<WxCdYyjl> selectYyjlList(WxCdYyjl wxCdYyjl);
 }

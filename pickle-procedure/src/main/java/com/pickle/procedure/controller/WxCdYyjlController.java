@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/wxCdYyjl")
 public class WxCdYyjlController extends BaseController<WxCdYyjl> {
@@ -38,5 +40,10 @@ public class WxCdYyjlController extends BaseController<WxCdYyjl> {
     public PageInfo<WxCdYyjl> queryPageList(@RequestBody WxCdYyjl wxCdYyjl) {
         PageHelper.startPage(wxCdYyjl.getPageNum(), wxCdYyjl.getPageSize());
         return wxCdYyjlService.getPage(wxCdYyjlService.queryPageList(wxCdYyjl), wxCdYyjl);
+    }
+
+    @RequestMapping("/selectYyjlList")
+    public List<WxCdYyjl> selectYyjlList(@RequestBody WxCdYyjl wxCdYyjl) {
+        return wxCdYyjlService.selectYyjlList(wxCdYyjl);
     }
 }

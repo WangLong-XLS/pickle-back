@@ -1,5 +1,6 @@
 package com.pickle.procedure.bean;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pickle.utils.base.BaseBean;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -69,6 +70,7 @@ public class WxCdCcxx extends BaseBean implements Serializable {
     private BigDecimal cdGdRs;
 
     //当前日期
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date dqRq;
 
     /**

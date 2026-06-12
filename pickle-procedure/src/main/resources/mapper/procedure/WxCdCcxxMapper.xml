@@ -473,7 +473,7 @@
 
   <select id="selectCcList" resultMap="BaseResultMapDTO" parameterType="com.pickle.procedure.bean.WxCdCcxx">
     SELECT
-        t1.CCYY_UUID, t1.CDXX_UUID, t1.CC_SD, t1.CD_DJ, t1.HJT_BZ, t1.PXH, t2.CD_MC, t2.CD_GD_RS, t2.CD_GD_RS - IFNULL(t3.YY_RS,0) CC_YW
+        t1.CCYY_UUID, t1.CDXX_UUID, t1.CC_SD, t1.CD_DJ, t1.HJT_BZ, t1.PXH, t2.CD_MC, t2.CD_GD_RS, ROUND(t2.CD_GD_RS - IFNULL(t3.YY_RS,0)) CC_YW
     FROM
         wx_cd_ccxx t1
         LEFT JOIN wx_cd_cdxx t2 ON t1.CDXX_UUID = t2.CDXX_UUID

@@ -5,11 +5,12 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.github.pagehelper.util.StringUtil;
 import com.pickle.procedure.bean.WxUser;
-import com.pickle.procedure.jwt.JwtTokenUtils;
 import com.pickle.procedure.mapper.WxUserMapper;
 import com.pickle.procedure.service.IWxUserService;
 import com.pickle.sys.bean.GgFj;
@@ -19,16 +20,17 @@ import com.pickle.utils.constant.StringConstant;
 import com.pickle.utils.date.DateUtils;
 import com.pickle.utils.enums.ManOrWom;
 import com.pickle.utils.exception.BizException;
-import com.pickle.utils.jwt.JwtUtil;
 import com.pickle.utils.redis.RedisCacheService;
 import com.pickle.utils.uuid.UUIDUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -39,8 +41,6 @@ import java.util.concurrent.TimeUnit;
 public class WxUserService extends BaseService<WxUser> implements IWxUserService {
     private final WxUserMapper wxUserMapper;
     private final RedisCacheService redisCacheService;
-    private final JwtUtil jwtUtil;
-    private final JwtTokenUtils jwtTokenUtils;
     private final IGgFjService ggFjService;
 
     @Value("${wx.miniapp.appid:}")
@@ -49,11 +49,24 @@ public class WxUserService extends BaseService<WxUser> implements IWxUserService
     @Value("${wx.miniapp.secret:}")
     private String secret;
 
+    @Value("${aliyun.oss.endpoint:}")
+    private String endpoint;
+
+    @Value("${aliyun.oss.bucket-name:}")
+    private String bucketName;
+
+    @Value("${aliyun.oss.access-key-id:}")
+    private String accessKeyId;
+
+    @Value("${aliyun.oss.access-key-secret:}")
+    private String accessKeySecret;
+
     private static final Date date = new Date();
-    private static final String filePath = System.getProperty("user.dir") +"\\file\\" + DateUtils.getYear(date) +"\\" +DateUtils.getMonth(date);
+    private static final String filePath = System.getProperty("user.dir") + "\\file\\" + DateUtils.getYear(date) + "\\" + DateUtils.getMonth(date);
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public WxUser login(WxUser sysUser) {
         // 1. 调用微信接口，用 code 换取 openId 和 sessionKey
         String wxUrl = String.format(
@@ -90,7 +103,7 @@ public class WxUserService extends BaseService<WxUser> implements IWxUserService
             wxUser.setSessionKey(sessionKey);
             wxUserMapper.insert(wxUser);
             log.info("创建新用户，openId: {}", openId);
-        }else {
+        } else {
             wxUser = wxUserList.get(0);
         }
 
@@ -99,7 +112,6 @@ public class WxUserService extends BaseService<WxUser> implements IWxUserService
         wxUser.setToken(token);
         redisCacheService.setCache(wxUser.getUserUuid(), wxUser, 60 * 60 * 24 * 30, TimeUnit.SECONDS);
         // 5. 返回用户信息
-        wxUser.setToken(token);
         return wxUser;
     }
 
@@ -112,38 +124,40 @@ public class WxUserService extends BaseService<WxUser> implements IWxUserService
                 .withExpiresAt(dateTime)
                 .sign(Algorithm.HMAC256(wxCode));
 
-        log.info("token已生成：" +token);
-        log.info(DateUtils.date2StringTime(dateTime, DateUtils.DATE_FORMAT_SECOND) +"之后过期");
-        return  token;
+        log.info("token已生成：" + token);
+        log.info(DateUtils.date2StringTime(dateTime, DateUtils.DATE_FORMAT_SECOND) + "之后过期");
+        return token;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public WxUser uploadAvatar(MultipartFile file, WxUser wxUser) {
         String filename = file.getOriginalFilename();
-        if (StringUtil.isEmpty(filename)){
+        if (StringUtil.isEmpty(filename)) {
             throw new BizException("文件名为空");
         }
+
         String uuid = UUIDUtil.newUUID();
         String[] split = filename.split(StringConstant.POINT);
 
-        String wjLj = filePath + "\\" + uuid +StringConstant.HYPHEN_LINE +filename;
-        try {
-            if (FileUtil.isDirectory(filePath)){
-                FileUtil.mkdir(filePath);
-            }
-            FileUtil.writeBytes(file.getBytes(), wjLj);
-            log.info("文件存放在" +filePath +"下");
-        } catch (IOException e) {
-            e.printStackTrace();
+        String wjLj;
+        if (wxUser.getScFs().equals("01")) {
+            wjLj = "userImage/" + uuid + StringConstant.HYPHEN_LINE + filename;
+            this.uploadService(file, wjLj);
+            wjLj = "https://xls-pickle.oss-cn-beijing.aliyuncs.com/" +wjLj;
+        } else {
+            wjLj = filePath + "\\" + uuid + StringConstant.HYPHEN_LINE + filename;
+            this.uploadLocal(file, wjLj);
         }
 
         GgFj ggFj = new GgFj();
         ggFj.setFjUuid(uuid);
+        ggFj.setYwUuid(wxUser.getUserUuid());
         ggFj.setFjMc(filename);
         ggFj.setFjLj(wjLj);
         ggFj.setWjDx(Integer.parseInt(String.valueOf(file.getSize())));
         ggFj.setWjGs(split[1]);
-        ggFj.setScFs("01");
+        ggFj.setScFs(wxUser.getScFs());
         ggFjService.save(ggFj);
 
         wxUser.setUserImage(wjLj);
@@ -151,10 +165,51 @@ public class WxUserService extends BaseService<WxUser> implements IWxUserService
         return wxUser;
     }
 
+    private void uploadService(MultipartFile file, String wjLj) {
+        // 创建 OSS 客户端并上传
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+        try (InputStream inputStream = file.getInputStream()) {
+            ossClient.putObject(bucketName, wjLj, inputStream);
+            log.info("上传成功");
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new BizException(e.getMessage());
+        } finally {
+            ossClient.shutdown();
+        }
+    }
+
+    private void uploadLocal(MultipartFile file, String wjLj) {
+        try {
+            if (FileUtil.isDirectory(filePath)) {
+                FileUtil.mkdir(filePath);
+            }
+            FileUtil.writeBytes(file.getBytes(), wjLj);
+            log.info("文件存放在" + filePath + "下");
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new BizException(e.getMessage());
+        }
+    }
+
     @Override
     public List<WxUser> queryPageList(WxUser wxUser) {
         List<WxUser> list = wxUserMapper.queryPageList(wxUser);
         list.forEach(e -> e.setUserSexMc(ManOrWom.MAN.getCode().equals(e.getUserSex()) ? ManOrWom.MAN.getMessage() : ManOrWom.WOMAN.getMessage()));
         return list;
+    }
+
+    @Override
+    public void updateData(WxUser wxUser) {
+        WxUser user = new WxUser();
+        user.setUserCode(wxUser.getUserCode());
+        List<WxUser> list = wxUserMapper.selectListByBean(user);
+        list.forEach(e ->{
+            if (!e.getUserUuid().equals(wxUser.getUserUuid())) {
+                throw new BizException("该用户ID已存在！");
+            }
+        });
+
+        wxUserMapper.updateByPrimaryKeySelective(wxUser);
     }
 }

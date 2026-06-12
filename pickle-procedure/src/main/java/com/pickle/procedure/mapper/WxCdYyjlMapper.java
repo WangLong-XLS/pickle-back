@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface WxCdYyjlMapper extends BaseMapper<WxCdYyjl> {
     List<WxCdYyjl> queryPageList(WxCdYyjl wxCdYyjl);
+
+    List<WxCdYyjl> selectYyjlList(WxCdYyjl wxCdYyjl);
 }

@@ -82,4 +82,9 @@ public class WxUser extends BaseBean implements Serializable {
      * 用户性别名称
      */
     private String userSexMc;
+
+    /**
+     * 上传方式
+     */
+    private String scFs;
 }
