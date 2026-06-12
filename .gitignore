@@ -43,3 +43,6 @@ logs/
 
 ### files ###
 files/
+
+**/application-dev.yml
+**/application-test.yml
