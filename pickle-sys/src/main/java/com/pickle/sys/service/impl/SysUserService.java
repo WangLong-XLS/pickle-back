@@ -3,6 +3,7 @@ package com.pickle.sys.service.impl;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.pickle.sys.bean.SysUser;
+import com.pickle.sys.config.SecurityProperties;
 import com.pickle.sys.mapper.SysUserMapper;
 import com.pickle.sys.service.ISysUserService;
 import com.pickle.utils.base.BaseService;
@@ -12,18 +13,28 @@ import com.pickle.utils.redis.RedisCacheService;
 import com.pickle.utils.uuid.UUIDUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 实现UserDetailsService接口，实现loadUserByUsername方法去校验用户名
+ * loadUserByUsername()会被过滤自动调用
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class SysUserService extends BaseService<SysUser> implements ISysUserService {
+public class SysUserService extends BaseService<SysUser> implements ISysUserService, UserDetailsService {
     private final SysUserMapper sysUserMapper;
     private final RedisCacheService redisCacheService;
+    private final SecurityProperties securityProperties;
 
     @Override
     public void saveData(SysUser sysUser) {
@@ -55,7 +66,28 @@ public class SysUserService extends BaseService<SysUser> implements ISysUserServ
 
     @Override
     public SysUser login(SysUser sysUser) {
-        // 创建一个新的 SysUser 对象，查找用户
+        // ========== 1. 先检查是否是超级管理员 ==========
+        SecurityProperties.UserProperties superAdmin = securityProperties.getUser();
+        if (superAdmin.getName() != null
+                && superAdmin.getName().equals(sysUser.getUserName())
+                && superAdmin.getPassword() != null
+                && superAdmin.getPassword().equals(sysUser.getUserPassword())) {
+
+            log.info("超级管理员登录：{}", superAdmin.getName());
+
+            // 构造虚拟 SysUser（超级管理员不在数据库表中）
+            SysUser user = new SysUser();
+            user.setUserUuid("sadmin-uuid");
+            user.setUserName(superAdmin.getName());
+            user.setUserPassword(superAdmin.getPassword());
+
+            String token = this.getToken(user.getUserUuid(), user.getUserPassword());
+            user.setToken(token);
+            redisCacheService.setCache(user.getUserUuid(), user, 60 * 30, TimeUnit.SECONDS);
+            return user;
+        }
+
+        // ========== 2. 普通用户：查数据库验证 ==========
         SysUser userBean = new SysUser();
         userBean.setUserName(sysUser.getUserName());
         List<SysUser> userList = sysUserMapper.selectListByBean(userBean);
@@ -95,5 +127,18 @@ public class SysUserService extends BaseService<SysUser> implements ISysUserServ
     @Override
     public List<SysUser> queryPageList(SysUser sysUser) {
         return sysUserMapper.selectListByBean((sysUser));
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) {
+        SysUser sysUser = new SysUser();
+        sysUser.setUserName(username);
+        List<SysUser> list = sysUserMapper.selectListByBean(sysUser);
+        if (list.isEmpty()){
+            throw new UsernameNotFoundException(username);
+        }
+
+        SysUser found = list.getFirst();
+        return new User(found.getUserName(), found.getUserPassword(), new ArrayList<>());
     }
 }

@@ -36,7 +36,17 @@ spring:
       max-file-size: 50MB
       #一次请求所有上传文件的总大小限制，默认10m
       max-request-size: 100MB
-
+  security:
+    #单个用户最大session数量
+    max-session-number: 10
+    #是否启用必须登录访问
+    enabled: true
+    #是否启用登录密码加密传输
+    encrypted-transmission-password: true
+    #超级管理员
+    user:
+      name: sadmin
+      password: 1
 
 logging:
   level:
@@ -46,7 +56,3 @@ logging:
   file:
     name: logs/pickle.log
 
-
-
-user_name: sadmin
-user_password: 1

@@ -8,7 +8,10 @@ import com.pickle.sys.mapper.DmSjXzqhMapper;
 import com.pickle.sys.mapper.DmXjXzqhMapper;
 import com.pickle.sys.service.IDmSjXzqhService;
 import com.pickle.utils.base.BaseService;
+import com.pickle.utils.constant.Cache;
+import com.pickle.utils.constant.CacheKey;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +26,7 @@ public class DmSjXzqhService extends BaseService<DmSjXzqh> implements IDmSjXzqhS
     private final DmXjXzqhMapper dmXjXzqhMapper;
 
     @Override
+    @Cacheable(value = Cache.DM, key = "'" + CacheKey.DM_NAME + "XZQX'")
     public List<DmSjXzqh> selectXzqhList(DmSjXzqh dmSjXzqh) {
         List<DmSjXzqh> dmSjXzqhList = dmSjXzqhMapper.selectListByBean(dmSjXzqh);
         List<DmShijXzqh> dmShijXzqhList = dmShijXzqhMapper.selectListByBean(new DmShijXzqh());

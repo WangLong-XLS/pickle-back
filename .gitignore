@@ -46,3 +46,4 @@ files/
 
 **/application-dev.yml
 **/application-test.yml
+**/application-pro.yml

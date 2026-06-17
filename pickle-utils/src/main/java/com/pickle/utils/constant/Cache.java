@@ -2,6 +2,12 @@ package com.pickle.utils.constant;
 
 public interface Cache {
 
+
+    /**
+     * 代码缓存
+     */
+    String DM = "dm";
+
     //自定义档案缓存
     String DOC = "doc";
 
