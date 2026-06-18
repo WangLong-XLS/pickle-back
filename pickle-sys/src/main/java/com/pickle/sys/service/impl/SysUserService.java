@@ -3,24 +3,24 @@ package com.pickle.sys.service.impl;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.pickle.sys.bean.SysUser;
+import com.pickle.sys.bean.SysUserOrg;
+import com.pickle.sys.bean.SysUserRole;
 import com.pickle.sys.config.SecurityProperties;
 import com.pickle.sys.mapper.SysUserMapper;
+import com.pickle.sys.mapper.SysUserOrgMapper;
+import com.pickle.sys.mapper.SysUserRoleMapper;
 import com.pickle.sys.service.ISysUserService;
 import com.pickle.utils.base.BaseService;
-import com.pickle.utils.date.DateUtils;
 import com.pickle.utils.exception.BizException;
 import com.pickle.utils.redis.RedisCacheService;
 import com.pickle.utils.uuid.UUIDUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -31,12 +31,16 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class SysUserService extends BaseService<SysUser> implements ISysUserService, UserDetailsService {
+public class SysUserService extends BaseService<SysUser> implements ISysUserService {
     private final SysUserMapper sysUserMapper;
     private final RedisCacheService redisCacheService;
     private final SecurityProperties securityProperties;
+    private final PasswordEncoder passwordEncoder;
+    private final SysUserRoleMapper sysUserRoleMapper;
+    private final SysUserOrgMapper sysUserOrgMapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveData(SysUser sysUser) {
         //用户名唯一
         SysUser user = new SysUser();
@@ -46,10 +50,37 @@ public class SysUserService extends BaseService<SysUser> implements ISysUserServ
         }
 
         sysUser.setUserUuid(UUIDUtil.newUUID());
+        // ← 密码加密后再入库
+        sysUser.setUserPassword(passwordEncoder.encode(sysUser.getUserPassword()));
         sysUserMapper.insertSelective(sysUser);
+
+        //去添加角色信息
+        List<SysUserRole> roles = new ArrayList<>();
+        sysUser.getRoleUuidIn().forEach(e ->{
+            SysUserRole sysUserRole = new SysUserRole();
+            sysUserRole.setUserRoleUuid(UUIDUtil.newUUID());
+            sysUserRole.setUserUuid(sysUser.getUserUuid());
+            sysUserRole.setRoleUuid(e);
+
+            roles.add(sysUserRole);
+        });
+        sysUserRoleMapper.batchInsert(roles);
+
+        //去添加机构信息
+        List<SysUserOrg> orgs = new ArrayList<>();
+        sysUser.getOrgUuidIn().forEach(e ->{
+            SysUserOrg sysUserOrg = new SysUserOrg();
+            sysUserOrg.setUserOrgUuid(UUIDUtil.newUUID());
+            sysUserOrg.setUserUuid(sysUser.getUserUuid());
+            sysUserOrg.setOrgUuid(e);
+
+            orgs.add(sysUserOrg);
+        });
+        sysUserOrgMapper.batchInsert(orgs);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateData(SysUser sysUser) {
         //用户名唯一
         SysUser user = new SysUser();
@@ -61,7 +92,42 @@ public class SysUserService extends BaseService<SysUser> implements ISysUserServ
             }
         }
 
+        if (sysUser.getUserPassword() != null && !sysUser.getUserPassword().isEmpty()) {
+            sysUser.setUserPassword(passwordEncoder.encode(sysUser.getUserPassword()));
+        }
         sysUserMapper.updateByPrimaryKeySelective(sysUser);
+
+        //去添加角色信息
+        SysUserRole userRole = new SysUserRole();
+        userRole.setUserUuid(sysUser.getUserUuid());
+        sysUserRoleMapper.deleteByBean(userRole);
+
+        List<SysUserRole> roles = new ArrayList<>();
+        sysUser.getRoleUuidIn().forEach(e ->{
+            SysUserRole sysUserRole = new SysUserRole();
+            sysUserRole.setUserRoleUuid(UUIDUtil.newUUID());
+            sysUserRole.setUserUuid(sysUser.getUserUuid());
+            sysUserRole.setRoleUuid(e);
+
+            roles.add(sysUserRole);
+        });
+        sysUserRoleMapper.batchInsert(roles);
+
+        //去添加机构信息
+        SysUserOrg userOrg = new SysUserOrg();
+        userOrg.setUserUuid(sysUser.getUserUuid());
+        sysUserOrgMapper.deleteByBean(userOrg);
+
+        List<SysUserOrg> orgs = new ArrayList<>();
+        sysUser.getOrgUuidIn().forEach(e ->{
+            SysUserOrg sysUserOrg = new SysUserOrg();
+            sysUserOrg.setUserOrgUuid(UUIDUtil.newUUID());
+            sysUserOrg.setUserUuid(sysUser.getUserUuid());
+            sysUserOrg.setOrgUuid(e);
+
+            orgs.add(sysUserOrg);
+        });
+        sysUserOrgMapper.batchInsert(orgs);
     }
 
     @Override
@@ -69,22 +135,23 @@ public class SysUserService extends BaseService<SysUser> implements ISysUserServ
         // ========== 1. 先检查是否是超级管理员 ==========
         SecurityProperties.UserProperties superAdmin = securityProperties.getUser();
         if (superAdmin.getName() != null
-                && superAdmin.getName().equals(sysUser.getUserName())
-                && superAdmin.getPassword() != null
-                && superAdmin.getPassword().equals(sysUser.getUserPassword())) {
+                && superAdmin.getName().equals(sysUser.getUserName())) {
 
-            log.info("超级管理员登录：{}", superAdmin.getName());
+            // ← 用 matches 比较，配置文件的密码也要存 BCrypt hash
+            if (passwordEncoder.matches(sysUser.getUserPassword(), superAdmin.getPassword())) {
+                log.info("超级管理员登录：{}", superAdmin.getName());
+                SysUser user = new SysUser();
+                user.setUserUuid("sadmin-uuid");
+                user.setUserName(superAdmin.getName());
+                user.setOrgCode("sadmin_org_code");
 
-            // 构造虚拟 SysUser（超级管理员不在数据库表中）
-            SysUser user = new SysUser();
-            user.setUserUuid("sadmin-uuid");
-            user.setUserName(superAdmin.getName());
-            user.setUserPassword(superAdmin.getPassword());
-
-            String token = this.getToken(user.getUserUuid(), user.getUserPassword());
-            user.setToken(token);
-            redisCacheService.setCache(user.getUserUuid(), user, 60 * 30, TimeUnit.SECONDS);
-            return user;
+                String token = this.getToken(user.getUserUuid(), superAdmin.getPassword());
+                user.setToken(token);
+                redisCacheService.setCache(user.getUserUuid(), user, 60 * 30, TimeUnit.SECONDS);
+                return user;
+            } else {
+                throw new BizException("密码错误");
+            }
         }
 
         // ========== 2. 普通用户：查数据库验证 ==========
@@ -96,11 +163,29 @@ public class SysUserService extends BaseService<SysUser> implements ISysUserServ
             throw new BizException("用户名不存在");
         }
 
-        SysUser user = userList.get(0);
+        SysUser user = userList.getFirst();
         // 用户存在，验证密码
-        if (!user.getUserPassword().equals(sysUser.getUserPassword())) {
+        if (!passwordEncoder.matches(sysUser.getUserPassword(), user.getUserPassword())) {
             throw new BizException("密码错误");
         }
+
+        //将角色和机构一并返回
+        SysUserRole userRole = new SysUserRole();
+        userRole.setUserUuid(sysUser.getUserUuid());
+        List<String> roleUuidIn = sysUserRoleMapper.selectListByBean(userRole)
+                .stream()
+                .map(SysUserRole::getRoleUuid)
+                .toList();
+
+        SysUserOrg userOrg = new SysUserOrg();
+        userOrg.setUserUuid(sysUser.getUserUuid());
+        List<String> orgUuidIn = sysUserOrgMapper.selectListByBean(userOrg)
+                .stream()
+                .map(SysUserOrg::getOrgUuid)
+                .toList();
+
+        user.setRoleUuidIn(roleUuidIn);
+        user.setOrgUuidIn(orgUuidIn);
 
         log.info("token开始生成");
         // 密码正确，返回成功，生成一个token
@@ -111,34 +196,17 @@ public class SysUserService extends BaseService<SysUser> implements ISysUserServ
     }
 
     private String getToken(String userId, String userPassword) {
-        Date dateTime = DateUtils.getSecondsLastTime(60 * 30);
-
-        // 生成 Token 的代码示例
+        // 去掉 withExpiresAt，JWT 永不过期，过期全靠 Redis TTL 控制
         String token = JWT.create()
-                .withAudience(userId)  // 添加这一行，将 userId 存入 audience
-                .withExpiresAt(dateTime)
+                .withAudience(userId)
                 .sign(Algorithm.HMAC256(userPassword));
 
-        log.info("token已生成：" +token);
-        log.info(DateUtils.date2StringTime(dateTime, DateUtils.DATE_FORMAT_SECOND) +"之后过期");
-        return  token;
+        log.info("token已生成：{}", token);
+        return token;
     }
 
     @Override
     public List<SysUser> queryPageList(SysUser sysUser) {
         return sysUserMapper.selectListByBean((sysUser));
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) {
-        SysUser sysUser = new SysUser();
-        sysUser.setUserName(username);
-        List<SysUser> list = sysUserMapper.selectListByBean(sysUser);
-        if (list.isEmpty()){
-            throw new UsernameNotFoundException(username);
-        }
-
-        SysUser found = list.getFirst();
-        return new User(found.getUserName(), found.getUserPassword(), new ArrayList<>());
     }
 }

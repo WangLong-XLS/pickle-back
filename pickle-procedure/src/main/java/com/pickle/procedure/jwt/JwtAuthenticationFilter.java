@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * JWT 认证过滤器（Spring Security Filter 方式）
@@ -116,6 +117,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
+        // ← 新增：刷新 Redis TTL，续期 30 分钟
+        redisCacheService.setCache(userId, cache, 60 * 30, TimeUnit.SECONDS);
         log.info("token验证通过，以 {} 方式请求：{}", request.getMethod(), request.getRequestURI());
         try {
             filterChain.doFilter(request, response);

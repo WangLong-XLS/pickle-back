@@ -46,7 +46,7 @@ spring:
     #超级管理员
     user:
       name: sadmin
-      password: 1
+      password: $2a$10$Xrv4AUo8Rwj8kfF0iabKz.OueQ71SVruqiKkyjjnodBREhSYE4xWi
 
 logging:
   level:

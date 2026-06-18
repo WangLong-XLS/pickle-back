@@ -30,7 +30,7 @@ public class SysUser extends BaseBean implements Serializable {
     /**
      * 用户名密码
      */
-    @Length(max = 50, message = "用户名密码长度不能超过50")
+    @Length(max = 200, message = "用户名密码长度不能超过200")
     private String userPassword;
 
     /**
@@ -80,4 +80,14 @@ public class SysUser extends BaseBean implements Serializable {
 
     //角色名称
     private String roleName;
+
+    /**
+     * 角色权限IDIn
+     */
+    private List<String> roleUuidIn;
+
+    /**
+     * 机构权限IDIn
+     */
+    private List<String> orgUuidIn;
 }
