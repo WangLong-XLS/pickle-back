@@ -5,7 +5,6 @@ import com.github.pagehelper.PageInfo;
 import com.pickle.sys.bean.SysMenu;
 import com.pickle.sys.service.ISysMenuService;
 import com.pickle.utils.base.BaseController;
-import com.pickle.utils.uuid.UUIDUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,20 +21,17 @@ public class SysMenuController extends BaseController<SysMenu> {
 
     @RequestMapping("/save")
     public void save(@Valid @RequestBody SysMenu sysMenu) {
-        sysMenu.setMenuUuid(UUIDUtil.newUUID());
-        sysMenuService.save(sysMenu);
+        sysMenuService.saveData(sysMenu);
     }
 
     @RequestMapping("/update")
     public void update(@Valid @RequestBody SysMenu sysMenu) {
-        sysMenuService.update(sysMenu);
+        sysMenuService.updateData(sysMenu);
     }
 
     @RequestMapping("/delete")
     public void delete(@RequestBody SysMenu sysMenu) {
-        if (!sysMenu.getMenuUuidIn().isEmpty()){
-            sysMenuService.batchDeleteByPrimaryKey(sysMenu.getMenuUuidIn());
-        }
+        sysMenuService.deleteData(sysMenu);
     }
 
     @RequestMapping("/getMenusByRole")

@@ -296,7 +296,7 @@
           ZF_RY_DM,
         </if>
         <if test="item.zfSj != null">
-          ZF_SJ,
+          ZF_SJ
         </if>
       </trim>
       <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -343,7 +343,7 @@
           #{item.zfRyDm},
         </if>
         <if test="item.zfSj != null and item.zfSj != ''">
-          #{item.zfSj},
+          #{item.zfSj}
         </if>
       </trim>
     </foreach>
@@ -364,7 +364,7 @@
     XG_SJ,
     SJGS_JG_DM,
     ZF_RY_DM,
-    ZF_SJ,
+    ZF_SJ
      ) VALUES
     <foreach collection="list" item="item" separator=",">
       (
@@ -382,7 +382,7 @@
       #{item.xgSj},
       #{item.sjgsJgDm},
       #{item.zfRyDm},
-      #{item.zfSj},
+      #{item.zfSj}
       )
     </foreach>
   </insert>
@@ -515,4 +515,32 @@
     DELETE FROM sys_user
     <include refid="Base_Where" />
   </delete>
+
+  <resultMap id="BaseResultMapDTO" extends="BaseResultMap" type="com.pickle.sys.bean.SysUser">
+    <result column="ORG_NAME" jdbcType="VARCHAR" property="orgName" />
+  </resultMap>
+
+  <select id="queryPageList" resultMap="BaseResultMapDTO" parameterType="com.pickle.sys.bean.SysUser">
+    SELECT
+        t1.USER_UUID, t1.USER_NAME, t1.USER_PASSWORD, t1.USER_AGE, t1.USER_SEX, t1.USER_PHONE, t1.ROLE_UUID, t1.ORG_CODE,
+        t1.CJ_RY_DM, t1.CJ_SJ, t1.XG_RY_DM, t1.XG_SJ, t1.SJGS_JG_DM, t1.ZF_RY_DM, t1.ZF_SJ, t2.ORG_NAME
+    FROM
+        sys_user t1
+        LEFT JOIN sys_ad_org t2 ON t1.ORG_CODE = t2.ORG_CODE
+        AND t2.ZF_BZ = 'N'
+    WHERE
+        t1.ZF_BZ = 'N'
+        <if test="userName != null and userName != ''">
+          AND USER_NAME = #{userName}
+        </if>
+        <if test="userPhone != null and userPhone != ''">
+          AND USER_PHONE = #{userPhone}
+        </if>
+        <if test="userUuidIn != null and userUuidIn.size() != 0">
+          AND USER_UUID IN
+          <foreach close=")" collection="userUuidIn" index="idx" item="item" open="(" separator=",">
+            #{item}
+          </foreach>
+        </if>
+  </select>
 </mapper>

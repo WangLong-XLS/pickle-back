@@ -2,9 +2,11 @@ package com.pickle.sys.bean;
 
 import com.pickle.utils.base.BaseBean;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serializable;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
 * @ClassName: SysRoleMenu
@@ -35,4 +37,7 @@ public class SysRoleMenu extends BaseBean implements Serializable {
     private String menuUuid;
 
     private static final long serialVersionUID = 1L;
+
+    //菜单IdIn
+    private List<String> menuUuidIn;
 }

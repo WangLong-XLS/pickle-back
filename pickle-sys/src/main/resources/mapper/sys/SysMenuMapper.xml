@@ -543,12 +543,10 @@
 
   <select id="getMenusByRole" resultMap="BaseResultMap" parameterType="com.pickle.sys.bean.SysMenu">
     SELECT
-        t1.MENU_UUID, t1.MENU_NAME, t1.MENU_PATH, t1.MENU_ICON, t1.PARENT_UUID, t1.MENU_ORDER, t1.MENU_TYPE, t1.VISIBLE,
-        t1.COMPONENT, t1.CJ_RY_DM, t1.CJ_SJ, t1.XG_RY_DM, t1.XG_SJ, t1.SJGS_JG_DM, t1.ZF_RY_DM, t1.ZF_SJ
+        t1.MENU_UUID, t1.MENU_NAME, t1.PARENT_UUID, t1.MENU_PATH, t1.COMPONENT
     FROM
         sys_menu t1
         LEFT JOIN sys_role_menu t2 ON t1.MENU_UUID = t2.MENU_UUID AND t2.ZF_BZ = 'N'
-        LEFT JOIN sys_role t3 ON t2.ROLE_UUID = t3.ROLE_UUID AND t3.ZF_BZ = 'N'
     WHERE
         t1.ZF_BZ = 'N'
         <if test="roleUuidIn != null and roleUuidIn.size() != 0">
@@ -557,6 +555,8 @@
             #{item}
           </foreach>
         </if>
+    GROUP BY
+        t1.MENU_UUID, t1.MENU_NAME, t1.PARENT_UUID, t1.MENU_PATH, t1.COMPONENT
   </select>
 
   <select id="selectParentList" resultMap="BaseResultMap">

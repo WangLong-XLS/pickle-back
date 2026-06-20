@@ -11,6 +11,7 @@ import com.pickle.sys.mapper.SysUserOrgMapper;
 import com.pickle.sys.mapper.SysUserRoleMapper;
 import com.pickle.sys.service.ISysUserService;
 import com.pickle.utils.base.BaseService;
+import com.pickle.utils.enums.ManOrWom;
 import com.pickle.utils.exception.BizException;
 import com.pickle.utils.redis.RedisCacheService;
 import com.pickle.utils.uuid.UUIDUtil;
@@ -207,6 +208,20 @@ public class SysUserService extends BaseService<SysUser> implements ISysUserServ
 
     @Override
     public List<SysUser> queryPageList(SysUser sysUser) {
-        return sysUserMapper.selectListByBean((sysUser));
+        List<SysUser> list = sysUserMapper.queryPageList((sysUser));
+        list.forEach(e -> {
+            SysUserOrg sysUserOrg = new SysUserOrg();
+            sysUserOrg.setUserUuid(e.getUserUuid());
+            List<SysUserOrg> orgs = sysUserOrgMapper.selectListByBean(sysUserOrg);
+
+            SysUserRole sysUserRole = new SysUserRole();
+            sysUserRole.setUserUuid(e.getUserUuid());
+            List<SysUserRole> roles = sysUserRoleMapper.selectListByBean(sysUserRole);
+
+            e.setUserSexName(e.getUserSex().equals(ManOrWom.MAN.getCode()) ? ManOrWom.MAN.getMessage() : ManOrWom.WOMAN.getMessage());
+            e.setOrgUuidIn(orgs.stream().map(SysUserOrg::getOrgUuid).toList());
+            e.setRoleUuidIn(roles.stream().map(SysUserRole::getRoleUuid).toList());
+        });
+        return list;
     }
 }

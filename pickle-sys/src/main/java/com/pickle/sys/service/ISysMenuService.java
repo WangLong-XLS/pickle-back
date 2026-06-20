@@ -12,4 +12,10 @@ public interface ISysMenuService extends IBaseService<SysMenu> {
     List<SysMenu> queryPageList(SysMenu sysMenu);
 
     List<SysMenu> selectParentList(@Valid SysMenu sysMenu);
+
+    void saveData(@Valid SysMenu sysMenu);
+
+    void updateData(@Valid SysMenu sysMenu);
+
+    void deleteData(SysMenu sysMenu);
 }

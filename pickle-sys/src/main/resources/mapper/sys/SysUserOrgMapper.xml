@@ -222,7 +222,7 @@
           ZF_RY_DM,
         </if>
         <if test="item.zfSj != null">
-          ZF_SJ,
+          ZF_SJ
         </if>
       </trim>
       <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -254,7 +254,7 @@
           #{item.zfRyDm},
         </if>
         <if test="item.zfSj != null and item.zfSj != ''">
-          #{item.zfSj},
+          #{item.zfSj}
         </if>
       </trim>
     </foreach>
@@ -270,7 +270,7 @@
     XG_SJ,
     SJGS_JG_DM,
     ZF_RY_DM,
-    ZF_SJ,
+    ZF_SJ
      ) VALUES
     <foreach collection="list" item="item" separator=",">
       (
@@ -283,7 +283,7 @@
       #{item.xgSj},
       #{item.sjgsJgDm},
       #{item.zfRyDm},
-      #{item.zfSj},
+      #{item.zfSj}
       )
     </foreach>
   </insert>
@@ -319,7 +319,7 @@
           ZF_RY_DM = #{item.zfRyDm},
         </if>
         <if test="item.zfSj != null and item.zfSj != ''">
-          ZF_SJ = #{item.zfSj},
+          ZF_SJ = #{item.zfSj}
         </if>
       </set>
       <where>
