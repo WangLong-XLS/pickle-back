@@ -541,9 +541,9 @@
     <include refid="Base_Where" />
   </delete>
 
-  <select id="getMenusByRole" resultMap="BaseResultMap" parameterType="com.pickle.sys.bean.SysMenu">
+  <select id="queryTreeList" resultMap="BaseResultMap" parameterType="com.pickle.sys.bean.SysMenu">
     SELECT
-        t1.MENU_UUID, t1.MENU_NAME, t1.PARENT_UUID, t1.MENU_PATH, t1.COMPONENT
+        t1.MENU_UUID, t1.MENU_NAME, t1.PARENT_UUID, t1.MENU_PATH, t1.COMPONENT, t1.MENU_ICON, t1.VISIBLE, t1.MENU_TYPE, t1.MENU_ORDER
     FROM
         sys_menu t1
         LEFT JOIN sys_role_menu t2 ON t1.MENU_UUID = t2.MENU_UUID AND t2.ZF_BZ = 'N'
@@ -556,17 +556,7 @@
           </foreach>
         </if>
     GROUP BY
-        t1.MENU_UUID, t1.MENU_NAME, t1.PARENT_UUID, t1.MENU_PATH, t1.COMPONENT
-  </select>
-
-  <select id="selectParentList" resultMap="BaseResultMap">
-    SELECT
-        <include refid="Base_Column_List" />
-    FROM
-        sys_menu
-    WHERE
-        ZF_BZ = 'N' AND PARENT_UUID IS NULL
-    ORDER BY MENU_ORDER
+        t1.MENU_UUID, t1.MENU_NAME, t1.PARENT_UUID, t1.MENU_PATH, t1.COMPONENT, t1.MENU_ICON, t1.VISIBLE, t1.MENU_TYPE, t1.MENU_ORDER
   </select>
 
   <select id="queryPageList" resultMap="BaseResultMap">
@@ -581,5 +571,9 @@
           <bind name="pattern" value="'%' + menuName + '%'" />
           AND MENU_NAME LIKE #{pattern}
         </if>
+        <if test="parentUuid != null and parentUuid != ''">
+          AND PARENT_UUID = #{parentUuid}
+        </if>
+    ORDER BY MENU_ORDER, XG_SJ DESC
   </select>
 </mapper>

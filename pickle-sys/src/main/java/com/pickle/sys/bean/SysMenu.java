@@ -54,7 +54,7 @@ public class SysMenu extends BaseBean implements Serializable {
     /**
      * 类型：0=菜单项，1=子菜单分组
      */
-    @Length(max = 1, message = "类型：0=菜单项，1=子菜单分组长度不能超过1")
+    @Length(max = 2, message = "类型：SYS_CD_LX长度不能超过2")
     private String menuType;
 
     /**

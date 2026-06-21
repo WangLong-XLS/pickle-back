@@ -8,40 +8,20 @@ import com.pickle.sys.service.ISysMenuService;
 import com.pickle.utils.base.BaseService;
 import com.pickle.utils.enums.YesOrNo;
 import com.pickle.utils.exception.BizException;
+import com.pickle.utils.list.TreeUtils;
 import com.pickle.utils.uuid.UUIDUtil;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class SysMenuService extends BaseService<SysMenu> implements ISysMenuService {
     private final SysMenuMapper sysMenuMapper;
     private final SysRoleMenuMapper sysRoleMenuMapper;
-
-    @Override
-    public List<SysMenu> getMenusByRole(SysMenu sysMenu) {
-        List<SysMenu> list = sysMenuMapper.getMenusByRole(sysMenu);
-
-        // 1. 找出所有根节点（parentUuid 为 null）
-        List<SysMenu> roots = list.stream()
-                .filter(m -> StringUtils.isBlank(m.getParentUuid()))
-                .sorted(Comparator.comparing(this::getOrderValue))
-                .toList();
-
-        // 2. 为每个根节点递归挂载子节点
-        for (SysMenu root : roots) {
-            root.setSysMenuIn(buildChildren(root, list));
-        }
-
-        return roots;
-    }
 
     @Override
     public List<SysMenu> queryPageList(SysMenu sysMenu) {
@@ -55,12 +35,6 @@ public class SysMenuService extends BaseService<SysMenu> implements ISysMenuServ
             e.setVisibleName(e.getVisible().equals(YesOrNo.YES.getCode()) ? YesOrNo.YES.getMessage() : YesOrNo.NO.getMessage());
             e.setRoleUuidIn(roleMenus.stream().map(SysRoleMenu::getRoleUuid).toList());
         });
-        return list;
-    }
-
-    @Override
-    public List<SysMenu> selectParentList(SysMenu sysMenu) {
-        List<SysMenu> list = sysMenuMapper.selectParentList(sysMenu);
         return list;
     }
 
@@ -133,33 +107,23 @@ public class SysMenuService extends BaseService<SysMenu> implements ISysMenuServ
         }
     }
 
-    /**
-     * 递归构建子节点
-     */
-    private List<SysMenu> buildChildren(SysMenu parent, List<SysMenu> allMenus) {
-        // 找出所有 parentUuid 等于当前节点 menuUuid 的子节点
-        List<SysMenu> children = allMenus.stream()
-                .filter(m -> parent.getMenuUuid().equals(m.getParentUuid()))
-                .sorted(Comparator.comparing(this::getOrderValue))
-                .collect(Collectors.toList());
-
-        // 递归：为每个子节点继续挂载它的子节点
-        for (SysMenu child : children) {
-            child.setSysMenuIn(buildChildren(child, allMenus));
-        }
-
-        return children;
+    @Override
+    public List<SysMenu> queryTreeList(SysMenu sysMenu) {
+        List<SysMenu> list = sysMenuMapper.queryTreeList(sysMenu);
+        List<SysMenu> buildTree = TreeUtils.buildTree(
+                list,
+                SysMenu::getMenuUuid,      // 获取节点ID
+                SysMenu::getParentUuid,    // 获取父节点ID
+                SysMenu::setSysMenuIn,     // 设置子节点列表
+                SysMenu::getMenuOrder      // 排序字段
+        );
+        buildTree.forEach(e ->{
+            SysRoleMenu sysRoleMenu = new SysRoleMenu();
+            sysRoleMenu.setMenuUuid(e.getMenuUuid());
+            List<SysRoleMenu> roleMenus = sysRoleMenuMapper.selectListByBean(sysRoleMenu);
+            e.setRoleUuidIn(roleMenus.stream().map(SysRoleMenu::getRoleUuid).toList());
+        });
+        return buildTree;
     }
 
-    /**
-     * 安全获取排序值
-     */
-    private int getOrderValue(SysMenu m) {
-        if (m.getMenuOrder() == null) return 0;
-        try {
-            return Integer.parseInt(m.getMenuOrder());
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
 }

@@ -27,6 +27,7 @@ public class SecurityConfig {
             "/sysUser/register",
             "/wxUser/login",
             "/pickle/swagger-ui/**",
+            "/pickle/swagger-ui.html",
             "/pickle/v3/api-docs/**",
             "/pickle/doc.html"
     };

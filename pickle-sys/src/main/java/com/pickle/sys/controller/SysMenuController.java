@@ -34,19 +34,14 @@ public class SysMenuController extends BaseController<SysMenu> {
         sysMenuService.deleteData(sysMenu);
     }
 
-    @RequestMapping("/getMenusByRole")
-    public List<SysMenu> getMenusByRole(@Valid @RequestBody SysMenu sysMenu) {
-        return sysMenuService.getMenusByRole(sysMenu);
-    }
-
     @RequestMapping("/queryPageList")
     public PageInfo<SysMenu> queryPageList(@RequestBody SysMenu sysMenu) {
         PageHelper.startPage(sysMenu.getPageNum(), sysMenu.getPageSize());
         return sysMenuService.getPage(sysMenuService.queryPageList(sysMenu), sysMenu);
     }
 
-    @RequestMapping("/selectParentList")
-    public List<SysMenu> selectParentList(@Valid @RequestBody SysMenu sysMenu) {
-        return sysMenuService.selectParentList(sysMenu);
+    @RequestMapping("/queryTreeList")
+    public List<SysMenu> queryTreeList(@Valid @RequestBody SysMenu sysMenu) {
+        return sysMenuService.queryTreeList(sysMenu);
     }
 }

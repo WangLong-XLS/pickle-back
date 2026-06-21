@@ -850,10 +850,12 @@ public class MyGeneratorPlugin extends PluginAdapter {
         XmlElement columnsElement = new XmlElement("set");
 
         // 为你想要插入的字段列表
-        for (IntrospectedColumn baseColumn : baseColumns) {
+        for (int i = 0; i < baseColumns.size(); i++) {
+            IntrospectedColumn baseColumn = baseColumns.get(i);
             String field = baseColumn.getActualColumnName();
             String javaProperty = baseColumn.getJavaProperty();
             String jdbcTypeName = baseColumn.getJdbcTypeName();
+            boolean isLast = (i == baseColumns.size() - 1);
 
             XmlElement ifElement = new XmlElement("if");
             if (jdbcTypeName.toLowerCase().contains("date")){
@@ -861,7 +863,7 @@ public class MyGeneratorPlugin extends PluginAdapter {
             }else {
                 ifElement.addAttribute(new Attribute("test", "item." + javaProperty + " != null and item." + javaProperty + " != ''"));
             }
-            ifElement.addElement(new TextElement(field + " = #{item." +javaProperty +"},"));
+            ifElement.addElement(new TextElement(field + " = #{item." +javaProperty +(isLast ? "}" : "},")));
             columnsElement.addElement(ifElement);
         }
         foreachElement.addElement(columnsElement);
@@ -897,18 +899,21 @@ public class MyGeneratorPlugin extends PluginAdapter {
         columnsElement.addAttribute(new Attribute("suffixOverrides", ","));
 
         // fieldsToInsert 为你想要插入的字段列表
-        for (IntrospectedColumn baseColumn : baseColumns) {
+        for (int i = 0; i < baseColumns.size(); i++) {
+            IntrospectedColumn baseColumn = baseColumns.get(i);
             String field = baseColumn.getActualColumnName();
             String javaProperty = baseColumn.getJavaProperty();
             String jdbcTypeName = baseColumn.getJdbcTypeName().toLowerCase();
+            boolean isLast = (i == baseColumns.size() - 1);  // ✅ 判断是否最后一个
 
             XmlElement ifElement = new XmlElement("if");
-            if (jdbcTypeName.contains("date") || jdbcTypeName.contains("timestamp") || jdbcTypeName.contains("decimal")){
+            if (jdbcTypeName.contains("date") || jdbcTypeName.contains("timestamp") || jdbcTypeName.contains("decimal")) {
                 ifElement.addAttribute(new Attribute("test", "item." + javaProperty + " != null"));
-            }else {
+            } else {
                 ifElement.addAttribute(new Attribute("test", "item." + javaProperty + " != null and item." + javaProperty + " != ''"));
             }
-            ifElement.addElement(new TextElement(field + ","));
+            // ✅ 最后一个字段不加逗号
+            ifElement.addElement(new TextElement(field + (isLast ? "" : ",")));
             columnsElement.addElement(ifElement);
         }
         foreachElement.addElement(columnsElement);
@@ -920,9 +925,11 @@ public class MyGeneratorPlugin extends PluginAdapter {
         valuesElement.addAttribute(new Attribute("suffixOverrides", ","));
 
         // 对应的值
-        for (IntrospectedColumn baseColumn : baseColumns) {
+        for (int i = 0; i < baseColumns.size(); i++) {
+            IntrospectedColumn baseColumn = baseColumns.get(i);
             String field = baseColumn.getJavaProperty();
             String jdbcTypeName = baseColumn.getJdbcTypeName().toLowerCase();
+            boolean isLast = (i == baseColumns.size() - 1);
 
             XmlElement ifElement = new XmlElement("if");
             if (jdbcTypeName.contains("date")){
@@ -930,7 +937,7 @@ public class MyGeneratorPlugin extends PluginAdapter {
             }else {
                 ifElement.addAttribute(new Attribute("test", "item." + field + " != null and item." + field + " != ''"));
             }
-            ifElement.addElement(new TextElement("#{item." + field + "},"));
+            ifElement.addElement(new TextElement("#{item." + field + (isLast ? "}" : "},")));
             valuesElement.addElement(ifElement);
         }
         foreachElement.addElement(valuesElement);
@@ -948,12 +955,12 @@ public class MyGeneratorPlugin extends PluginAdapter {
         insertElement.addElement(new TextElement("INSERT INTO " +tableName +"("));
 
         // fieldsToInsert 为你想要插入的字段列表
-        for (IntrospectedColumn baseColumn : baseColumns) {
+        for (int i = 0; i < baseColumns.size(); i++) {
+            IntrospectedColumn baseColumn = baseColumns.get(i);
             String field = baseColumn.getActualColumnName();
-            String javaProperty = baseColumn.getJavaProperty();
-            String jdbcTypeName = baseColumn.getJdbcTypeName().toLowerCase();
+            boolean isLast = (i == baseColumns.size() - 1);
 
-            insertElement.addElement(new TextElement(field + ","));
+            insertElement.addElement(new TextElement(field + (isLast ? "" : ",")));
         }
         insertElement.addElement(new TextElement(" ) VALUES"));
 
@@ -965,11 +972,11 @@ public class MyGeneratorPlugin extends PluginAdapter {
         foreachElement.addElement(new TextElement("("));
 
         // 对应的值
-        for (IntrospectedColumn baseColumn : baseColumns) {
+        for (int i = 0; i < baseColumns.size(); i++) {
+            IntrospectedColumn baseColumn = baseColumns.get(i);
             String field = baseColumn.getJavaProperty();
-            String jdbcTypeName = baseColumn.getJdbcTypeName().toLowerCase();
-
-            foreachElement.addElement(new TextElement("#{item." + field + "},"));
+            boolean isLast = (i == baseColumns.size() - 1);
+            foreachElement.addElement(new TextElement("#{item." + field +  (isLast ? "}" : "},")));
         }
         foreachElement.addElement(new TextElement(")"));
 
