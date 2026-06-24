@@ -7,4 +7,8 @@ import java.util.List;
 
 public interface ISysRoleService extends IBaseService<SysRole> {
     List<SysRole> queryPageList(SysRole sysRole);
+
+    void saveData(SysRole sysRole);
+
+    void updateData(SysRole sysRole);
 }

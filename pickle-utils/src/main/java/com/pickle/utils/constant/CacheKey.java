@@ -7,9 +7,9 @@ public interface CacheKey {
     String DM_NAME = "DM_";
 
     /**
-     * 自定义档案表缓存key前缀
+     * 菜单缓存key前缀
      */
-    String DOC_NAME = "DOC_";
+    String MENU_NAME = "MENU_";
 
 
 }

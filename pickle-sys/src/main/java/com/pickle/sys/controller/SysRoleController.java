@@ -5,10 +5,10 @@ import com.github.pagehelper.PageInfo;
 import com.pickle.sys.bean.SysRole;
 import com.pickle.sys.service.ISysRoleService;
 import com.pickle.utils.base.BaseController;
-import com.pickle.utils.uuid.UUIDUtil;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -19,14 +19,13 @@ public class SysRoleController extends BaseController<SysRole> {
     private ISysRoleService sysRoleService;
 
     @RequestMapping("/save")
-    public void save(@Valid @RequestBody SysRole sysRole) {
-        sysRole.setRoleUuid(UUIDUtil.newUUID());
-        sysRoleService.save(sysRole);
+    public void save(@RequestBody SysRole sysRole) {
+        sysRoleService.saveData(sysRole);
     }
 
     @RequestMapping("/update")
-    public void update(@Valid @RequestBody SysRole sysRole) {
-        sysRoleService.update(sysRole);
+    public void update(@RequestBody SysRole sysRole) {
+        sysRoleService.updateData(sysRole);
     }
 
     @RequestMapping("/delete")
@@ -35,6 +34,7 @@ public class SysRoleController extends BaseController<SysRole> {
             sysRoleService.batchDeleteByPrimaryKey(sysRole.getRoleUuidIn());
         }
     }
+
 
     @RequestMapping("/queryPageList")
     public PageInfo<SysRole> queryPageList(@RequestBody SysRole sysRole) {

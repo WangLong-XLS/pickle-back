@@ -15,12 +15,12 @@ import com.pickle.procedure.mapper.WxUserMapper;
 import com.pickle.procedure.service.IWxUserService;
 import com.pickle.sys.bean.GgFj;
 import com.pickle.sys.service.IGgFjService;
+import com.pickle.sys.service.IRedisService;
 import com.pickle.utils.base.BaseService;
 import com.pickle.utils.constant.StringConstant;
 import com.pickle.utils.date.DateUtils;
 import com.pickle.utils.enums.ManOrWom;
 import com.pickle.utils.exception.BizException;
-import com.pickle.utils.redis.RedisCacheService;
 import com.pickle.utils.uuid.UUIDUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class WxUserService extends BaseService<WxUser> implements IWxUserService {
     private final WxUserMapper wxUserMapper;
-    private final RedisCacheService redisCacheService;
+    private final IRedisService redisService;
     private final IGgFjService ggFjService;
 
     @Value("${wx.miniapp.appid:}")
@@ -110,7 +110,7 @@ public class WxUserService extends BaseService<WxUser> implements IWxUserService
         // 4. 生成 JWT token
         String token = this.getToken(wxUser.getUserUuid(), wxUser.getWxCode());
         wxUser.setToken(token);
-        redisCacheService.setCache(wxUser.getUserUuid(), wxUser, 60 * 60 * 24 * 30, TimeUnit.SECONDS);
+        redisService.setCache(wxUser.getUserUuid(), wxUser, 60 * 60 * 24 * 30, TimeUnit.SECONDS);
         // 5. 返回用户信息
         return wxUser;
     }

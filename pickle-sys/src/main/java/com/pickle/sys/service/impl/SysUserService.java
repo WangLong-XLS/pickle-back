@@ -9,11 +9,11 @@ import com.pickle.sys.config.SecurityProperties;
 import com.pickle.sys.mapper.SysUserMapper;
 import com.pickle.sys.mapper.SysUserOrgMapper;
 import com.pickle.sys.mapper.SysUserRoleMapper;
+import com.pickle.sys.service.IRedisService;
 import com.pickle.sys.service.ISysUserService;
 import com.pickle.utils.base.BaseService;
 import com.pickle.utils.enums.ManOrWom;
 import com.pickle.utils.exception.BizException;
-import com.pickle.utils.redis.RedisCacheService;
 import com.pickle.utils.uuid.UUIDUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class SysUserService extends BaseService<SysUser> implements ISysUserService {
     private final SysUserMapper sysUserMapper;
-    private final RedisCacheService redisCacheService;
+    private final IRedisService redisService;
     private final SecurityProperties securityProperties;
     private final PasswordEncoder passwordEncoder;
     private final SysUserRoleMapper sysUserRoleMapper;
@@ -93,8 +93,11 @@ public class SysUserService extends BaseService<SysUser> implements ISysUserServ
             }
         }
 
+        // 更新时 — 只对明文密码加密，已加密的跳过
         if (sysUser.getUserPassword() != null && !sysUser.getUserPassword().isEmpty()) {
-            sysUser.setUserPassword(passwordEncoder.encode(sysUser.getUserPassword()));
+            if (!sysUser.getUserPassword().startsWith("$2a$")) {
+                sysUser.setUserPassword(passwordEncoder.encode(sysUser.getUserPassword()));
+            }
         }
         sysUserMapper.updateByPrimaryKeySelective(sysUser);
 
@@ -137,22 +140,7 @@ public class SysUserService extends BaseService<SysUser> implements ISysUserServ
         SecurityProperties.UserProperties superAdmin = securityProperties.getUser();
         if (superAdmin.getName() != null
                 && superAdmin.getName().equals(sysUser.getUserName())) {
-
-            // ← 用 matches 比较，配置文件的密码也要存 BCrypt hash
-            if (passwordEncoder.matches(sysUser.getUserPassword(), superAdmin.getPassword())) {
-                log.info("超级管理员登录：{}", superAdmin.getName());
-                SysUser user = new SysUser();
-                user.setUserUuid("sadmin-uuid");
-                user.setUserName(superAdmin.getName());
-                user.setOrgCode("sadmin_org_code");
-
-                String token = this.getToken(user.getUserUuid(), superAdmin.getPassword());
-                user.setToken(token);
-                redisCacheService.setCache(user.getUserUuid(), user, 60 * 30, TimeUnit.SECONDS);
-                return user;
-            } else {
-                throw new BizException("密码错误");
-            }
+            return this.loginSadminUser(superAdmin, sysUser);
         }
 
         // ========== 2. 普通用户：查数据库验证 ==========
@@ -172,14 +160,14 @@ public class SysUserService extends BaseService<SysUser> implements ISysUserServ
 
         //将角色和机构一并返回
         SysUserRole userRole = new SysUserRole();
-        userRole.setUserUuid(sysUser.getUserUuid());
+        userRole.setUserUuid(user.getUserUuid());
         List<String> roleUuidIn = sysUserRoleMapper.selectListByBean(userRole)
                 .stream()
                 .map(SysUserRole::getRoleUuid)
                 .toList();
 
         SysUserOrg userOrg = new SysUserOrg();
-        userOrg.setUserUuid(sysUser.getUserUuid());
+        userOrg.setUserUuid(user.getUserUuid());
         List<String> orgUuidIn = sysUserOrgMapper.selectListByBean(userOrg)
                 .stream()
                 .map(SysUserOrg::getOrgUuid)
@@ -192,8 +180,43 @@ public class SysUserService extends BaseService<SysUser> implements ISysUserServ
         // 密码正确，返回成功，生成一个token
         String token = this.getToken(user.getUserUuid(), user.getUserPassword());
         user.setToken(token);
-        redisCacheService.setCache(user.getUserUuid(), user, 60 * 30, TimeUnit.SECONDS);
+        redisService.setCache(user.getUserUuid(), user, 60 * 30, TimeUnit.SECONDS);
         return user;
+    }
+
+    private SysUser loginSadminUser(SecurityProperties.UserProperties superAdmin, SysUser sysUser) {
+        // ← 用 matches 比较，配置文件的密码也要存 BCrypt hash
+        if (passwordEncoder.matches(sysUser.getUserPassword(), superAdmin.getPassword())) {
+            log.info("超级管理员登录：{}", superAdmin.getName());
+            SysUser user = new SysUser();
+            user.setUserUuid("sadmin-uuid");
+            user.setUserName(superAdmin.getName());
+            user.setUserPassword(superAdmin.getPassword());
+            user.setOrgCode("sadmin_org_code");
+
+            //将角色和机构一并返回
+            SysUserRole userRole = new SysUserRole();
+            List<String> roleUuidIn = sysUserRoleMapper.selectListByBean(userRole)
+                    .stream()
+                    .map(SysUserRole::getRoleUuid)
+                    .toList();
+
+            SysUserOrg userOrg = new SysUserOrg();
+            List<String> orgUuidIn = sysUserOrgMapper.selectListByBean(userOrg)
+                    .stream()
+                    .map(SysUserOrg::getOrgUuid)
+                    .toList();
+
+            user.setRoleUuidIn(roleUuidIn);
+            user.setOrgUuidIn(orgUuidIn);
+
+            String token = this.getToken(user.getUserUuid(), superAdmin.getPassword());
+            user.setToken(token);
+            redisService.setCache(user.getUserUuid(), user, 60 * 30, TimeUnit.SECONDS);
+            return user;
+        } else {
+            throw new BizException("密码错误");
+        }
     }
 
     private String getToken(String userId, String userPassword) {

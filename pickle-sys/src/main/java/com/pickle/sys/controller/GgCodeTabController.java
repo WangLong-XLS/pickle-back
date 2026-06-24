@@ -3,7 +3,6 @@ package com.pickle.sys.controller;
 import com.pickle.sys.bean.GgCodeTab;
 import com.pickle.sys.service.IGgCodeTabService;
 import com.pickle.utils.base.BaseController;
-import com.pickle.utils.redis.RedisCacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +16,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class GgCodeTabController extends BaseController<GgCodeTab> {
     private final IGgCodeTabService ggCodeTabService;
-    private final RedisCacheService redisCacheService;
 
     @RequestMapping("/save")
     public void save(@RequestBody GgCodeTab ggCodeTab) {

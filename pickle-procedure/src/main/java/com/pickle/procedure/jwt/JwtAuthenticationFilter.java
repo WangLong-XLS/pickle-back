@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.util.StringUtil;
 import com.pickle.procedure.bean.WxUser;
 import com.pickle.sys.bean.SysUser;
-import com.pickle.utils.redis.RedisCacheService;
+import com.pickle.sys.service.IRedisService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final RedisCacheService redisCacheService;
+    private final IRedisService redisService;
 
     /** 不需要 JWT 校验的白名单路径 */
     private static final String[] WHITE_LIST = {
@@ -85,7 +85,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             userId = JWT.decode(token).getAudience().getFirst();
-            cache = redisCacheService.getCache(userId);
+            cache = redisService.getCache(userId);
 
             if (cache == null) {
                 writeError(response, "该用户信息不存在，请重新登录");
@@ -118,7 +118,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // ← 新增：刷新 Redis TTL，续期 30 分钟
-        redisCacheService.setCache(userId, cache, 60 * 30, TimeUnit.SECONDS);
+        redisService.setCache(userId, cache, 60 * 30, TimeUnit.SECONDS);
         log.info("token验证通过，以 {} 方式请求：{}", request.getMethod(), request.getRequestURI());
         try {
             filterChain.doFilter(request, response);

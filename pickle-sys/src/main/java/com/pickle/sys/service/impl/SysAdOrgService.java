@@ -5,6 +5,7 @@ import com.pickle.sys.mapper.SysAdOrgMapper;
 import com.pickle.sys.service.ISysAdOrgService;
 import com.pickle.utils.base.BaseService;
 import com.pickle.utils.constant.Cache;
+import com.pickle.utils.enums.YesOrNo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -28,14 +29,14 @@ public class SysAdOrgService extends BaseService<SysAdOrg> implements ISysAdOrgS
     @Override
     public List<SysAdOrg> queryPageList(SysAdOrg sysAdOrg) {
         List<SysAdOrg> list = sysAdOrgMapper.selectListByBean(sysAdOrg);
-     /*   list.forEach(e ->{
+        list.forEach(e ->{
             if (e.getIsCorporate() != null){
                 e.setIsCorporateName(e.getIsCorporate().equals(YesOrNo.YES.getCode()) ? YesOrNo.YES.getMessage() : YesOrNo.NO.getMessage());
             }
             if (e.getIsGroup() != null){
                 e.setIsGroupName(e.getIsGroup().equals(YesOrNo.YES.getCode()) ? YesOrNo.YES.getMessage() : YesOrNo.NO.getMessage());
             }
-        });*/
+        });
         return list;
     }
 }

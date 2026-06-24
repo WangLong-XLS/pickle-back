@@ -14,4 +14,6 @@ public interface Cache {
     //机构缓存
     String ORG = "org";
 
+    //菜单缓存
+    String MENU = "menu";
 }

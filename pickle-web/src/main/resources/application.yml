@@ -1,7 +1,6 @@
 # ???? WEB ????
 server:
   port: 8888
-#  port: 8881
   servlet:
     #系统上下文
     context-path: /pickle

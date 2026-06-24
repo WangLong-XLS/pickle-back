@@ -28,13 +28,13 @@ public abstract class BaseService<T extends BaseBean> implements IBaseService<T>
     public T queryFirstByBean(T data) {
         PageHelper.startPage(1, 1, false);
         List<T> ts = this.queryListByBean(data);
-        return ts != null && ts.size() > 0 ? ts.get(0) : null;
+        return ts != null && !ts.isEmpty() ? ts.getFirst() : null;
     }
 
     public T queryFirstByMap(Map<String, Object> map) {
         PageHelper.startPage(1, 1, false);
         List<T> ts = mapper.selectListByMap(map);
-        return ts != null && !ts.isEmpty() ? ts.get(0) : null;
+        return ts != null && !ts.isEmpty() ? ts.getFirst() : null;
     }
 
     public List<T> queryListByBean(T data) {
